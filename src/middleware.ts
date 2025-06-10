@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { USER_ROLE } from "./constants/constants";
 
 const publicRoutes = ["/", "/forgot-password"];
-
 const authRoutes = [
   "/auth/signin",
   "/auth/signup",
@@ -24,26 +23,45 @@ export function middleware(request: NextRequest) {
     !pathname.startsWith("/auth") &&
     !isExplicitlyRestricted;
 
+  // 🔒 Not logged in
   if (!userCookie) {
-    // User is not logged in
     if (!isAuthRoute && !isPublicRoute && !isDynamicPublicRoute) {
       return NextResponse.redirect(new URL("/auth/signin", request.url));
     }
+
+    // Unauthenticated users accessing root should go to dashboard
+    if (pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // Unauthenticated users accessing dashboard should go to menu
+    if (pathname === "/dashboard") {
+      return NextResponse.redirect(new URL("/menu", request.url));
+    }
+
     return NextResponse.next();
   }
 
   const user = JSON.parse(userCookie.value || "{}");
 
-  // Redirect authenticated users away from auth routes
+  // 🚫 Redirect logged-in users away from auth pages
   if (isAuthRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // ✅ If user is not a USER and trying to access "/", redirect to store page
-  if (pathname === "/" && user?.roleId !== USER_ROLE.USER && user?.storeId) {
-    const encodedStoreId = btoa(user.storeId.toString());
-    return NextResponse.redirect(new URL(`/${encodedStoreId}`, request.url));
+  // 🧭 Handle root path "/"
+  if (pathname === "/") {
+    if (user?.roleId === USER_ROLE.USER) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    } else {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
+
+  // 🚫 Public users can't access /dashboard
+  // if (pathname === "/dashboard" && user?.roleId === USER_ROLE.USER) {
+  //   return NextResponse.redirect(new URL("/menu", request.url));
+  // }
 
   return NextResponse.next();
 }

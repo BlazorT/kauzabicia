@@ -42,4 +42,20 @@ export const authService = {
     const data: RESPONSE = await response.json();
     return data;
   },
+  uploadsMultiImages: async (formData: FormData): Promise<RESPONSE> => {
+    const response = await fetch(API_URL + "api/blazorApi/uploads", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: process.env.NEXT_PUBLIC_API_KEY ?? "",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: RESPONSE = await response.json();
+    return data;
+  },
 };

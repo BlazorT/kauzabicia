@@ -4,8 +4,8 @@ import {
   RESPONSE,
   STORE_FILTERS_BODY,
 } from "@/utils/types";
-import apiClient from "./apiClient";
 import moment from "moment";
+import apiClient from "./apiClient";
 
 export const menuService = {
   getMenu: async (menuBody: Partial<MENU_FORM>): Promise<RESPONSE> => {
@@ -15,15 +15,23 @@ export const menuService = {
     );
     return response.data;
   },
-  getAllMenus: async (): Promise<RESPONSE> => {
+  getAllMenus: async (storeId?: number): Promise<RESPONSE> => {
     const allMenuBody = {
       id: "0",
-      storeId: "0",
+      storeId: storeId ? storeId?.toString() : "0",
     };
     const response = await apiClient.post(
       "/api/blazorApi/allproducts",
       allMenuBody
     );
+    return response.data;
+  },
+  getStoreMenu: async (): Promise<RESPONSE> => {
+    const response = await apiClient.get("/api/blazorApi/products");
+    return response.data;
+  },
+  getUnits: async (): Promise<RESPONSE> => {
+    const response = await apiClient.get("/api/blazorApi/tradeunits");
     return response.data;
   },
   getFilterStores: async (
@@ -147,6 +155,14 @@ export const menuService = {
   cancelTableBookings: async (body: any): Promise<RESPONSE> => {
     const response = await apiClient.post(
       `/api/blazorApi/addupdatetablebooking`,
+      body
+    );
+    return response.data;
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addUpdateProduct: async (body: any): Promise<RESPONSE> => {
+    const response = await apiClient.post(
+      `/api/blazorApi/addupdateproductdetal`,
       body
     );
     return response.data;

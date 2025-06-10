@@ -112,7 +112,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
             title: "Continue",
             onClick: () => {
               hideAlert();
-              router.push(`/${btoa(items[0]?.storeId?.toString())}`);
+              router.push(`/dashboard/menu`);
             },
           },
         ],
@@ -163,7 +163,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     updatedItems.forEach((item: MenuItem) => {
       addItem(item);
     });
-    router.push(`/${btoa(order?.storeid?.toString())}`);
+    router.push(`/dashboard/menu`);
   };
   const onTrackOrder = () => {
     const track_url = `${API_URL}/dHJhY2tteW9yZGVy/${btoa(
@@ -173,7 +173,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   };
 
   const toOrderDetails = () => {
-    router.push(`/orders/${btoa(order.saleid?.toString())}`);
+    router.push(`/dashboard/orders/${btoa(order.saleid?.toString())}`);
   };
   // console.log({ order });
 

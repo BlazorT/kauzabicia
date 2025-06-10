@@ -15,7 +15,7 @@ export const useStorePage = (id?: string) => {
   const { user } = useAuth();
   const slug = params.slug || [];
 
-  const encodedStoreId = id ?? slug[0]; // always present
+  const encodedStoreId = id ?? btoa(JSON.stringify(1)); // always present
   const encodedSaleId =
     user && user?.roleId !== USER_ROLE.USER ? searchParams.get("saleId") : null;
 

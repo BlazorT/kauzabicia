@@ -7,9 +7,10 @@ import { Input } from "../ui/input"; // Assuming you have a styled Input compone
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
-type AllMenuProduct = {
+export type AllMenuProduct = {
   id: string;
   productId: number;
+  name: string;
   productname: string;
   unitId: number;
 };

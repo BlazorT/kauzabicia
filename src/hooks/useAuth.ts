@@ -21,3 +21,8 @@ export const useUploadImage = () => {
     mutationFn: authService.uploadImage,
   });
 };
+export const useUploadMultiImages = () => {
+  return useMutation({
+    mutationFn: authService.uploadsMultiImages,
+  });
+};

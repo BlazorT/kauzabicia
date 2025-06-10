@@ -3,6 +3,8 @@ export const QUERY_KEYS = {
   USER_DETAIL: "user-detail",
   MENU: "menu",
   ALL_MENUS: "all-menus",
+  STORE_MENUS: "store-menus",
+  UNITS: "units",
   FILTERED_STORES: "filtered_store",
   STORE: "store",
   TABLES: "tables",

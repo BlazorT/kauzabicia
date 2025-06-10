@@ -84,12 +84,31 @@ export const useGetDealDetail = (dealId: number) => {
   });
 };
 
-export const useGetAllMenus = () => {
+export const useGetAllMenus = (storeId?: number) => {
   return useQuery({
     queryKey: [QUERY_KEYS.ALL_MENUS],
-    queryFn: () => menuService.getAllMenus(),
+    queryFn: () => menuService.getAllMenus(storeId),
     staleTime: 30 * 60 * 1000, // 5 minutes: data is fresh for this duration
     refetchInterval: 30 * 60 * 1000, // refetch every 5 minutes
+    refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
+  });
+};
+
+export const useGetStoreMenus = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.STORE_MENUS],
+    queryFn: () => menuService.getStoreMenu(),
+    staleTime: 60 * 60 * 1000, // 1 hour: data is fresh for this duration
+    refetchInterval: 60 * 60 * 1000, // refetch every 5 minutes
+    refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
+  });
+};
+export const useGetUnits = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.UNITS],
+    queryFn: () => menuService.getUnits(),
+    staleTime: 60 * 60 * 1000, // 1 hour: data is fresh for this duration
+    refetchInterval: 60 * 60 * 1000, // refetch every 5 minutes
     refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
   });
 };
@@ -97,6 +116,11 @@ export const useGetAllMenus = () => {
 export const useAddToFavorite = () => {
   return useMutation({
     mutationFn: menuService.addStoreProductToFavorite,
+  });
+};
+export const useAddUpdateProduct = () => {
+  return useMutation({
+    mutationFn: menuService.addUpdateProduct,
   });
 };
 

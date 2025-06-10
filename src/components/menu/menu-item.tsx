@@ -108,7 +108,7 @@ export const MenuItem = ({
             isHalal={item.isHalal === 1}
           />
 
-          <div className="flex-1">
+          <div className="flex-4/5">
             <div className="flex items-start justify-between">
               <MenuItemHeader
                 name={item.productname}
