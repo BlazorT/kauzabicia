@@ -12,7 +12,7 @@ import { API_URL } from "@/services/apiClient";
 import { MenuItem } from "@/utils/types";
 import moment from "moment";
 
-export const columns: ColumnDef<MenuItem>[] = [
+const columns: ColumnDef<MenuItem>[] = [
   {
     accessorKey: "producturl",
     header: "Product",
