@@ -1,6 +1,6 @@
 import { useLocation } from "@/context/location-context";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
-import { StoreDetail } from "@/utils/types";
+import { MenuItem, StoreDetail } from "@/utils/types";
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
@@ -138,7 +138,7 @@ const HomeMap = ({
               )}
             >
               <Popup className="p-0" offset={[0, -5]}>
-                <StoreItem store={store} />
+                <StoreItem store={store as unknown as MenuItem} />
               </Popup>
               <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
                 <div className="flex gap-2">

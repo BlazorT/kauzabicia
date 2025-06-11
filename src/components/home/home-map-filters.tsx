@@ -1,14 +1,14 @@
 import { useLocation } from "@/context/location-context";
 import { useLOV } from "@/context/lov-context";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAddress, useGetAddressList } from "@/hooks/useMap";
 import { useStoreFiltersQuery } from "@/hooks/useStoreFiltersQuery";
-import { getCoverageBuffer, getDistanceUnit } from "@/utils/storeUtils";
+import { getDistanceUnit } from "@/utils/storeUtils";
 import { ADDRESS_RESPONSE } from "@/utils/types";
 import { Loader2, LocateFixed, MapPin, X } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
-import HomeMap from "../map/home-map";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -20,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useDebounce } from "@/hooks/useDebounce";
 
 type HomeMapFiltersProps = {
   isVisible: boolean;
@@ -314,13 +313,13 @@ const HomeMapFilters: React.FC<HomeMapFiltersProps> = ({
         {/* Section: Map */}
         <p>{filteredStores?.length} Restaurants Found</p>
         <div className="relative rounded-md overflow-hidden border">
-          <HomeMap
+          {/* <HomeMap
             searchBuffer={getCoverageBuffer(
               filters.searchRange ?? 0,
               ipInfo?.geoplugin_countryCode ?? ""
             )}
             stores={filteredStores}
-          />
+          /> */}
 
           {isPending && (
             <div className="absolute inset-0 bg-black/30 flex justify-center items-center z-[99999]">

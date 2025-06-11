@@ -25,7 +25,7 @@ const DealItemControll: React.FC<DealItemProps> = ({
     isError,
   } = useGetDealDetail(dealItem.id);
   // console.log(dealItem.id);
-  const { addItem, items, clearCart } = useCart();
+  const { items, clearCart } = useCart();
   const { showAlert } = useAlert();
   const params = useParams();
   const slug = params.slug || [];
@@ -47,40 +47,40 @@ const DealItemControll: React.FC<DealItemProps> = ({
   if (isError) return null;
 
   const addDealtoCart = () => {
-    dealProducts?.forEach((item) => {
-      addItem({
-        producturl: item.producturl,
-        productname: item.productName,
-        productDetailId: item.productDetailId,
-        unitprice: item.defaultFixPrice,
-        quantity: item.schemeBundleQty,
-        storeId: item.storeId,
-        dealPrice: item.dealPrice,
-        dealCode: dealItem.dealCode,
-        schemeAmount: dealItem.schemeAmount,
-        currencycode: dealItem.currencyCode,
-        isDeal: true,
-        id: 0,
-        linediscount: 0,
-        productId: 0,
-        description: "",
-        offerPerc: 0,
-        offerQty: 0,
-        defaultFixPrice: 0,
-        categoryid: 0,
-        productcategory: "",
-        unitname: "",
-        isSpecial: 0,
-        isHalal: 0,
-        isFavourite: 0,
-        mostlyBoughtTogether: 0,
-        points: 0,
-        status: 0,
-        productOptionsJSON: "",
-        tax: 0,
-        kitchenTimeInMins: 0,
-      });
-    });
+    // dealProducts?.forEach((item) => {
+    //   addItem({
+    //     producturl: item.producturl,
+    //     productname: item.productName,
+    //     productDetailId: item.productDetailId,
+    //     unitprice: item.defaultFixPrice,
+    //     quantity: item.schemeBundleQty,
+    //     storeId: item.storeId,
+    //     dealPrice: item.dealPrice,
+    //     dealCode: dealItem.dealCode,
+    //     schemeAmount: dealItem.schemeAmount,
+    //     currencycode: dealItem.currencyCode,
+    //     isDeal: true,
+    //     id: 0,
+    //     linediscount: 0,
+    //     productId: 0,
+    //     description: "",
+    //     offerPerc: 0,
+    //     offerQty: 0,
+    //     defaultFixPrice: 0,
+    //     categoryid: 0,
+    //     productcategory: "",
+    //     unitname: "",
+    //     isSpecial: 0,
+    //     isHalal: 0,
+    //     isFavourite: 0,
+    //     mostlyBoughtTogether: 0,
+    //     points: 0,
+    //     status: 0,
+    //     productOptionsJSON: "",
+    //     tax: 0,
+    //     kitchenTimeInMins: 0,
+    //   });
+    // });
     toast.success(`${dealItem.dealCode} deal has been added to cart.`);
   };
 
