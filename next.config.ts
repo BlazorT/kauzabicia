@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: [
       "hotmealzndealz.com",
+      "kalida.hotmealzndealz.com",
       "http://192.168.18.4:9898/",
       "http://192.168.18.4:9119/",
       "https://lh3.googleusercontent.com",
@@ -13,6 +14,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "hotmealzndealz.com",
+        pathname: "/vehicleImages/**",
+      },
+      {
+        protocol: "https",
+        hostname: "kalida.hotmealzndealz.com",
         pathname: "/vehicleImages/**",
       },
       {

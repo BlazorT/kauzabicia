@@ -1,6 +1,5 @@
 // hooks/useStoreFiltersQuery.ts
 import { DEFAULT_STORE_ID } from "@/constants/constants";
-import { useLocation } from "@/context/location-context";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
 import { MenuItem } from "@/utils/types";
 import moment from "moment";
@@ -9,7 +8,7 @@ import { useMenu } from "./useMenu";
 
 export const useStoreFiltersQuery = (searchQuery: string) => {
   const { filters, clearAllFilters, filterCount } = useRestaurantFilters();
-  const { ipInfo } = useLocation();
+  // const { ipInfo } = useLocation();
 
   // const storeFiltersBody = useMemo((): STORE_FILTERS_BODY => {
   //   const location =
@@ -133,13 +132,13 @@ export const useStoreFiltersQuery = (searchQuery: string) => {
 
     return result;
   }, [
-    storeData,
     searchQuery,
-    filters.sortBy,
-    filters.offerId, // Make sure this is included as a dependency
-    filters.lat,
-    filters.lng,
-    ipInfo,
+    storeData,
+    // filters.sortBy,
+    // filters.offerId, // Make sure this is included as a dependency
+    // filters.lat,
+    // filters.lng,
+    // ipInfo,
   ]);
 
   return {
