@@ -33,7 +33,7 @@ const data = {
   },
   teams: [
     {
-      name: "Kauzabicia",
+      name: "Kalida",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },

@@ -1,77 +1,77 @@
 "use client";
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
-import * as React from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
 
+import ProductAction from "@/components/grid-action/product-action";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { GridTable } from "@/components/ui/grid-table";
 import { useMenu } from "@/hooks/useMenu";
+import { API_URL } from "@/services/apiClient";
 import { MenuItem } from "@/utils/types";
 import moment from "moment";
-import Spinner from "@/components/ui/spinner";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<MenuItem>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    accessorKey: "producturl",
+    header: "Product",
+    cell: ({ row }) => {
+      const product = row.original;
+      const productname = product.productname;
+      // Assuming 'user' and 'firstName' exist
+      let initials = "";
+      if (productname && productname.length >= 2) {
+        initials = productname.slice(0, 2).toUpperCase();
+      } else if (productname && productname.length === 1) {
+        initials = productname.toUpperCase();
+      }
+
+      return (
+        <div className="capitalize">
+          {API_URL && (
+            <Avatar className="size-8">
+              <AvatarImage
+                src={API_URL + row.getValue("producturl")}
+                alt={row.getValue("productname")}
+              />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "productname",
     header: "Product Name",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("productname")}</div>
+      <div className="capitalize">
+        {row.getValue("productname")} - {row.getValue("unitname")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "barcode",
+    header: "Product Code",
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {row.getValue("barcode") === "" ? "-" : row.getValue("barcode")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "unitname",
+    header: "Unit Name",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("unitname")}</div>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("status")}</div>
     ),
   },
   {
@@ -87,203 +87,79 @@ export const columns: ColumnDef<Payment>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("unitprice")}</div>
-    ),
+    cell: ({ row }) => {
+      const value = row.getValue("unitprice") as number;
+      return <div className="lowercase">{value?.toFixed(2)}</div>;
+    },
   },
   {
-    accessorKey: "tax",
-    header: "Tax (%)",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("tax")}</div>,
-  },
-  {
-    accessorKey: "linediscount",
-    header: "Discount",
+    accessorKey: "kitchenTimeInMins",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Ready Time (mins)
+          <ArrowUpDown />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("linediscount")}</div>
+      <div className="capitalize">{row.getValue("kitchenTimeInMins")}</div>
     ),
   },
-  //   {
-  //     id: "actions",
-  //     enableHiding: false,
-  //     cell: ({ row }) => {
-  //       const payment = row.original;
 
-  //       return (
-  //         <DropdownMenu>
-  //           <DropdownMenuTrigger asChild>
-  //             <Button variant="ghost" className="h-8 w-8 p-0">
-  //               <span className="sr-only">Open menu</span>
-  //               <MoreHorizontal />
-  //             </Button>
-  //           </DropdownMenuTrigger>
-  //           <DropdownMenuContent align="end">
-  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //             <DropdownMenuItem
-  //               onClick={() => navigator.clipboard.writeText(payment.id)}
-  //             >
-  //               Copy payment ID
-  //             </DropdownMenuItem>
-  //             <DropdownMenuSeparator />
-  //             <DropdownMenuItem>View customer</DropdownMenuItem>
-  //             <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //           </DropdownMenuContent>
-  //         </DropdownMenu>
-  //       );
-  //     },
-  //   },
+  {
+    id: "actions",
+    enableHiding: false,
+    header: "Action",
+    cell: ({ row }) => {
+      const product = row.original;
+      return <ProductAction product={product} />;
+    },
+  },
+  {
+    id: "lastUpdatedAt",
+    header: "lastUpdatedAt",
+    sortingFn: "datetime",
+    cell: ({ row }) => moment(row.getValue("lastUpdatedAt")).local().format(""),
+  },
 ];
 
 function Products() {
   const { data: menuResponse, isPending } = useMenu(
     "1",
-    moment().format("YYYY-MM-DDTHH:mm:ss")
+    moment().format("YYYY-MM-DDTHH:mm:ss"),
+    "0",
+    "0"
   );
-
   const products = (menuResponse?.data ?? []) as MenuItem[] | [];
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data: products,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
+  const sorting = [
+    {
+      id: "lastUpdatedAt",
+      desc: true, // sort by name in descending order by default
     },
-  });
+  ];
+
+  const columnVisibility = {
+    unitname: false,
+    status: false,
+    lastUpdatedAt: false,
+  };
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter Product Name..."
-          value={
-            (table.getColumn("productname")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("productname")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isPending && <Spinner />}
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <GridTable
+        columns={columns}
+        data={products}
+        showPagination
+        initialColumnVisibility={columnVisibility}
+        initialSorting={sorting}
+        loading={isPending}
+        filterableColumnId="productname"
+        filterableColumnPlaceholder="Search Products..."
+      />
     </div>
   );
 }

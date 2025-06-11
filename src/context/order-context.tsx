@@ -25,12 +25,15 @@ interface Table {
 export interface OrderInfo {
   orderType: number;
   deliveryCharges: number;
+  serviceCharges: number;
   address: string;
   deliveryDistance: number;
+  stateId: number;
   orderNote: string;
   guests: string;
   email: string;
   phone: string;
+  whatsApp: string;
   name: string;
   deliveryOption: number;
   voucherDiscount: number;
@@ -64,8 +67,11 @@ const OrderContext = createContext<OrderContextType>({
   orderInfo: {
     orderType: 3,
     deliveryCharges: 0,
+    serviceCharges: 0,
     address: "",
     deliveryDistance: 0,
+    stateId: 0,
+    whatsApp: "",
     orderNote: "",
     guests: "",
     email: "",
@@ -102,6 +108,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     deliveryCharges: 0,
     address: "",
     deliveryDistance: 0,
+    serviceCharges: 0,
     orderNote: "",
     guests: "",
     email: "",
@@ -114,6 +121,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     isRedeemPoints: false,
     pointsRedeemed: 0,
     pointsDiscount: 0,
+    stateId: 0,
+    whatsApp: "",
     tipAmount: 0,
     paymentMethodId: 1,
     paymentGateway: null,

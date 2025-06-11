@@ -4,48 +4,46 @@ import CheckoutSummary from "@/components/checkout/checkout-summary";
 import { useCart } from "@/context/cart-context";
 import { useConfig } from "@/context/config-context";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 const CheckoutPage = () => {
   const { items } = useCart();
   const { config } = useConfig();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+  // const searchParams = useSearchParams();
+  // const pathname = usePathname();
 
-  useEffect(() => {
-    const amount = searchParams.get("amount");
-    const orderRefNumber = searchParams.get("orderRefNumber");
-    const message = searchParams.get("message");
-    const transactionRefNumber = searchParams.get("transactionRefNumber");
+  // useEffect(() => {
+  //   const amount = searchParams.get("amount");
+  //   const orderRefNumber = searchParams.get("orderRefNumber");
+  //   const message = searchParams.get("message");
+  //   const transactionRefNumber = searchParams.get("transactionRefNumber");
 
-    // console.log({ pp_ResponseMessage });
-    setTimeout(() => {
-      if (amount || orderRefNumber || message) {
-        if (window.opener) {
-          const data = {
-            orderRefNumber,
-            message,
-            amount,
-            transactionRefNumber,
-          };
-          window.opener.postMessage(
-            {
-              status: message ? "failed" : "success",
-              txnRef: orderRefNumber,
-              message: message ?? "",
-              data: btoa(JSON.stringify(data)),
-            },
-            "*"
-          );
-          window.close();
-          // Optional: Close popup after a delay
-        }
+  //   // console.log({ pp_ResponseMessage });
+  //   setTimeout(() => {
+  //     if (amount || orderRefNumber || message) {
+  //       if (window.opener) {
+  //         const data = {
+  //           orderRefNumber,
+  //           message,
+  //           amount,
+  //           transactionRefNumber,
+  //         };
+  //         window.opener.postMessage(
+  //           {
+  //             status: message ? "failed" : "success",
+  //             txnRef: orderRefNumber,
+  //             message: message ?? "",
+  //             data: btoa(JSON.stringify(data)),
+  //           },
+  //           "*"
+  //         );
+  //         window.close();
+  //         // Optional: Close popup after a delay
+  //       }
 
-        // Remove query params from URL
-      }
-    }, 1000);
-  }, [searchParams, pathname]);
+  //       // Remove query params from URL
+  //     }
+  //   }, 1000);
+  // }, [searchParams, pathname]);
 
   if (items.length === 0 && config?.storeId) {
     return (

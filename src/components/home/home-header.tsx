@@ -1,14 +1,10 @@
-import HeaderAddress from "./header-address";
+import { DialogProps } from "@/utils/types";
+import { ModeToggle } from "../ui/theme-menu";
+import HeaderCart from "./header-cart";
 import HeaderLogo from "./header-logo";
 import HeaderProfile from "./heder-profile";
-import HeaderCart from "./header-cart";
-import { ModeToggle } from "../ui/theme-menu";
-import { DialogProps } from "@/utils/types";
 
-const HomeHeader: React.FC<DialogProps> = ({
-  isMapVisible,
-  toggleIsMapVisble,
-}) => {
+const HomeHeader: React.FC<DialogProps> = ({}) => {
   return (
     // Main container: column on small, row on large
     <div className="flex flex-col lg:flex-row items-center justify-between w-full">
@@ -26,10 +22,10 @@ const HomeHeader: React.FC<DialogProps> = ({
       {/* Layout for large screens */}
       <div className="hidden lg:flex items-center justify-between w-full">
         <HeaderLogo /> {/* Left */}
-        <HeaderAddress
+        {/* <HeaderAddress
           isMapVisible={isMapVisible}
           toggleIsMapVisble={toggleIsMapVisble}
-        />{" "}
+        />{" "} */}
         {/* Center */}
         {/* Right group: Actions */}
         <div className="flex gap-5 items-center">
@@ -40,12 +36,12 @@ const HomeHeader: React.FC<DialogProps> = ({
       </div>
 
       {/* Address for small screens - shown below the first row */}
-      <div className="lg:hidden w-full flex justify-center mt-2 text-sm">
+      {/* <div className="lg:hidden w-full flex justify-center mt-2 text-sm">
         <HeaderAddress
           isMapVisible={isMapVisible}
           toggleIsMapVisble={toggleIsMapVisble}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

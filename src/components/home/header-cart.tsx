@@ -1,17 +1,31 @@
 "use client";
 
+import { useAlert } from "@/context/alert-context";
+import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const HeaderCart = () => {
   const { items } = useCart();
+  const { user } = useAuth();
+  const { showAlert } = useAlert();
 
   const router = useRouter();
 
   const toMenu = () => {
     if (items.length === 0) return;
-    else router.push(`/${btoa(items[0]?.storeId?.toString())}`);
+    if (!user) {
+      showAlert({
+        title: "Heads Up!",
+        description:
+          "To access and proceed with your quotations, please sign in. It only takes a moment!",
+        confirmText: "Sign In Now",
+        onConfirm: () => router.push(`/auth/signin`),
+        cancelText: "Cancel",
+      });
+      return;
+    } else router.push(`/menu`);
   };
   return (
     <div

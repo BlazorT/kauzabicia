@@ -80,7 +80,7 @@ export const useStorePage = (id?: string) => {
   const { data: dealResponse, isLoading: isDealsLoading } = useGetDealz(
     parseInt(validStoreId)
   );
-
+  // console.log({ menuResponse });
   const { data: orderDetailRes } = useFetchOrderDetails(
     saleId ? saleId?.toString() : null
   );

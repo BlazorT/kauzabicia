@@ -53,8 +53,6 @@ export default function DeliveryAddress() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressList]);
 
-  if (orderInfo?.orderType !== 3) return null;
-
   const toggleShowAddress = () => setShowChangeAddress((prev) => !prev);
   const clearSearch = () => {
     setSearchAddress("");

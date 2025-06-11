@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     domains: [
       "hotmealzndealz.com",
       "http://192.168.18.4:9898/",
+      "http://192.168.18.4:9119/",
       "https://lh3.googleusercontent.com",
       "https://platform-lookaside.fbsbx.com",
     ],
@@ -28,6 +29,11 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "192.168.18.4",
         port: "9898",
+      },
+      {
+        protocol: "http",
+        hostname: "192.168.18.4",
+        port: "9119",
       },
     ],
   },

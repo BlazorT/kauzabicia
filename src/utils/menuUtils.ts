@@ -1,6 +1,11 @@
 // src/app/[storeId]/utils/menuUtils.ts
 import { CartItem } from "@/context/cart-context";
-import { MenuItem as MenuItemType, MenuCategory } from "@/utils/types";
+import { API_URL } from "@/services/apiClient";
+import {
+  MenuItem as MenuItemType,
+  MenuCategory,
+  MenuItem,
+} from "@/utils/types";
 import moment from "moment";
 
 export const organizeMenuByCategory = (
@@ -203,4 +208,39 @@ export const getMaxKitchenTime = (products: CartItem[]) => {
     const kitchenTime = product.kitchenTimeInMins || 0; // Default to 0 if kitchenTimeInMins is not present
     return Math.max(maxTime, kitchenTime);
   }, 0);
+};
+
+export const getImageUrlsFromVariation = (
+  selectedVariation: MenuItem | undefined,
+  fallbackImage = "/no-image.png"
+): string[] => {
+  if (!selectedVariation) return [fallbackImage];
+
+  const { menuJSON, producturl } = selectedVariation;
+
+  if (menuJSON === "") {
+    return [producturl ? API_URL + producturl : fallbackImage];
+  }
+
+  if (menuJSON) {
+    try {
+      const jsonArray = JSON.parse(menuJSON);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const urls = jsonArray.map((item: any) => {
+        const cleanPath = item.FileName.replace(/^wwwroot[\\/]+/, "").replace(
+          /\\/g,
+          "/"
+        );
+        return `${API_URL}/${cleanPath}`;
+      });
+      return urls.length
+        ? urls
+        : [producturl ? API_URL + producturl : fallbackImage];
+    } catch (err) {
+      console.error("Invalid JSON in selectedVariation.menuJSON", err);
+      return [producturl ? API_URL + producturl : fallbackImage];
+    }
+  }
+
+  return [producturl ? API_URL + producturl : fallbackImage];
 };

@@ -30,13 +30,13 @@ export function middleware(request: NextRequest) {
     }
 
     // Unauthenticated users accessing root should go to dashboard
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
+    // if (pathname === "/") {
+    //   return NextResponse.redirect(new URL("/dashboard", request.url));
+    // }
 
     // Unauthenticated users accessing dashboard should go to menu
     if (pathname === "/dashboard") {
-      return NextResponse.redirect(new URL("/menu", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     return NextResponse.next();
@@ -51,9 +51,7 @@ export function middleware(request: NextRequest) {
 
   // 🧭 Handle root path "/"
   if (pathname === "/") {
-    if (user?.roleId === USER_ROLE.USER) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    } else {
+    if (user?.roleId !== USER_ROLE.USER) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

@@ -5,8 +5,6 @@ import { ErrorVariant, useError } from "@/context/error-context";
 import { useLocation } from "@/context/location-context";
 import { useOrder } from "@/context/order-context";
 import { useDistanceAndAddressInfo } from "@/hooks/useDistanceAndAddressInfo";
-import { useEasyPaisa } from "@/hooks/useEasyPaisa";
-import { useJazzCash } from "@/hooks/useJazzCash";
 import { useFetchOrderDetails, usePlaceOrder } from "@/hooks/useOrder";
 import { useSocket } from "@/hooks/useSocket";
 import { getOrCreateSessionId, isEmail } from "@/lib/utils";
@@ -17,7 +15,6 @@ import {
   getTaxAmount,
   getTotalOrderAmount,
 } from "@/utils/cartUtils";
-import { isSixDigitNumber, isValidMobileNumber } from "@/utils/formUtils";
 import {
   COLLAPSIBLE_REF,
   JazzCashIPNData,
@@ -31,20 +28,17 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RefObject, useEffect, useMemo, useRef } from "react";
 import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
-import JazzCashConfirm from "./jazz-cash-confirm";
 
 import checkmarkAnimation from "@/assets/checkmark.json"; // adjust path accordingly
-import { useGooglePay } from "@/hooks/useGooglePay";
+import { useAuth } from "@/context/auth-context";
+import { useLOV } from "@/context/lov-context";
+import { useRestaurantFilters } from "@/context/restaurant-filter-context";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
 import {
   getDistanceBuffer,
   getDistanceUnit,
   isDistanceBufferValid,
 } from "@/utils/storeUtils";
-import JCInitiateLoading from "./jazz-cash-initiate-load";
-import { useAuth } from "@/context/auth-context";
-import { useLOV } from "@/context/lov-context";
-import { useRestaurantFilters } from "@/context/restaurant-filter-context";
 import { BookingInfo } from "../order/order-detail";
 
 type PlaceOrderProps = {
@@ -53,7 +47,7 @@ type PlaceOrderProps = {
 };
 
 export default function PlaceOrder({
-  guestsCollapsibleRef,
+  // guestsCollapsibleRef,
   customerCollapsibleRef,
 }: PlaceOrderProps) {
   const { isFetching } = useDistanceAndAddressInfo();
@@ -83,16 +77,16 @@ export default function PlaceOrder({
     [orderDetailRes]
   ) as OrderProduct[];
 
-  const { prepareRequest } = useEasyPaisa();
-  const { GooglePayButtonComponent, onGooglePay } = useGooglePay();
-  const {
-    triggerJazzCashPayment,
-    initiateJCPayment,
-    isPending: paymentInitiatedPending,
-    isPaymentInitiated,
-    isPaymentSuccess,
-    loadingJC,
-  } = useJazzCash();
+  // const { prepareRequest } = useEasyPaisa();
+  // const { GooglePayButtonComponent, onGooglePay } = useGooglePay();
+  // const {
+  //   triggerJazzCashPayment,
+  //   initiateJCPayment,
+  //   isPending: paymentInitiatedPending,
+  //   isPaymentInitiated,
+  //   isPaymentSuccess,
+  //   loadingJC,
+  // } = useJazzCash();
 
   const socketRef = useSocket();
 
@@ -144,28 +138,28 @@ export default function PlaceOrder({
     return true;
   };
 
-  const validateGuests = () => {
-    if (
-      orderInfo.orderType === 1 &&
-      (!orderInfo.guests || orderInfo.guests === "0")
-    ) {
-      setError({
-        title: "Guests are required",
-        message:
-          "Please enter the number of guests or book table for dine in orders.",
-        variant: ErrorVariant.Warning,
-      });
-      guestsCollapsibleRef.current?.setIsOpen(true);
-      setTimeout(() => {
-        const guestInput = document.getElementById("numberOfGuests");
-        if (guestInput) {
-          guestInput.focus();
-        }
-      }, 200);
-      return false;
-    }
-    return true;
-  };
+  // const validateGuests = () => {
+  //   if (
+  //     orderInfo.orderType === 1 &&
+  //     (!orderInfo.guests || orderInfo.guests === "0")
+  //   ) {
+  //     setError({
+  //       title: "Guests are required",
+  //       message:
+  //         "Please enter the number of guests or book table for dine in orders.",
+  //       variant: ErrorVariant.Warning,
+  //     });
+  //     guestsCollapsibleRef.current?.setIsOpen(true);
+  //     setTimeout(() => {
+  //       const guestInput = document.getElementById("numberOfGuests");
+  //       if (guestInput) {
+  //         guestInput.focus();
+  //       }
+  //     }, 200);
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
   const validateEmail = () => {
     if (orderInfo.email === "") return true;
@@ -186,7 +180,7 @@ export default function PlaceOrder({
   };
 
   const validatePhone = () => {
-    if (!orderInfo.phone && orderInfo.orderType === 3) {
+    if (!orderInfo.phone) {
       setError({
         title: "Phone number",
         message: "Please enter a valid phone number",
@@ -228,105 +222,109 @@ export default function PlaceOrder({
     return true;
   };
 
-  const validatePayment = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (totalOrderAmount < 1) {
-      return true;
-    }
-    if (orderInfo.paymentMethodId === 0) {
-      setError({
-        message: "Please select a payment method to process with your order.",
-        variant: ErrorVariant.Warning,
-      });
-      return false;
-    }
-    if (orderInfo.paymentMethodId !== 2) {
-      return true;
-    }
-    if (orderInfo.paymentGatewayId === 0) {
-      setError({
-        message: "Please select a gateway to process with your order.",
-        variant: ErrorVariant.Warning,
-      });
-      return false;
-    }
-    if (orderInfo?.paymentGateway?.name?.toLowerCase() === "gpay") {
-      onGooglePay(e);
-      return false;
-    }
-    if (orderInfo.paymentGateway?.name?.toLowerCase() === "jazzcash") {
-      if (!orderInfo.jazzCashMode) {
-        setError({
-          title: "JazzCash",
-          message:
-            "Please select a jazzcash payment method, you can either pay from mobile acount or pay through card.",
-          variant: ErrorVariant.Warning,
-        });
-        return false;
-      }
-      if (orderInfo.jazzCashMode === "wallet") {
-        if (!isValidMobileNumber(orderInfo.jazzCashNumber)) {
-          setError({
-            title: "JazzCash",
-            message: "Please enter a valid mobile number. e.g 03001234567",
-            variant: ErrorVariant.Warning,
-          });
-          return false;
-        }
-        if (!isSixDigitNumber(orderInfo.jazzCashCNIC)) {
-          setError({
-            title: "JazzCash",
-            message: "Please enter a last 6 digits of your CNIC.",
-            variant: ErrorVariant.Warning,
-          });
-          return false;
-        }
-        initiateJCPayment();
-        return false;
-      }
-      if (orderInfo.jazzCashMode === "card") {
-        triggerJazzCashPayment();
-        return false;
-      }
-    }
-    if (orderInfo.paymentGateway?.name?.toLowerCase() === "easypaisa") {
-      prepareRequest();
-      return false;
-    }
+  // const validatePayment = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   if (totalOrderAmount < 1) {
+  //     return true;
+  //   }
+  //   if (orderInfo.paymentMethodId === 0) {
+  //     setError({
+  //       message: "Please select a payment method to process with your order.",
+  //       variant: ErrorVariant.Warning,
+  //     });
+  //     return false;
+  //   }
+  //   if (orderInfo.paymentMethodId !== 2) {
+  //     return true;
+  //   }
+  //   if (orderInfo.paymentGatewayId === 0) {
+  //     setError({
+  //       message: "Please select a gateway to process with your order.",
+  //       variant: ErrorVariant.Warning,
+  //     });
+  //     return false;
+  //   }
+  //   if (orderInfo?.paymentGateway?.name?.toLowerCase() === "gpay") {
+  //     onGooglePay(e);
+  //     return false;
+  //   }
+  //   if (orderInfo.paymentGateway?.name?.toLowerCase() === "jazzcash") {
+  //     if (!orderInfo.jazzCashMode) {
+  //       setError({
+  //         title: "JazzCash",
+  //         message:
+  //           "Please select a jazzcash payment method, you can either pay from mobile acount or pay through card.",
+  //         variant: ErrorVariant.Warning,
+  //       });
+  //       return false;
+  //     }
+  //     if (orderInfo.jazzCashMode === "wallet") {
+  //       if (!isValidMobileNumber(orderInfo.jazzCashNumber)) {
+  //         setError({
+  //           title: "JazzCash",
+  //           message: "Please enter a valid mobile number. e.g 03001234567",
+  //           variant: ErrorVariant.Warning,
+  //         });
+  //         return false;
+  //       }
+  //       if (!isSixDigitNumber(orderInfo.jazzCashCNIC)) {
+  //         setError({
+  //           title: "JazzCash",
+  //           message: "Please enter a last 6 digits of your CNIC.",
+  //           variant: ErrorVariant.Warning,
+  //         });
+  //         return false;
+  //       }
+  //       initiateJCPayment();
+  //       return false;
+  //     }
+  //     if (orderInfo.jazzCashMode === "card") {
+  //       triggerJazzCashPayment();
+  //       return false;
+  //     }
+  //   }
+  //   if (orderInfo.paymentGateway?.name?.toLowerCase() === "easypaisa") {
+  //     prepareRequest();
+  //     return false;
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
-  const validateOrder = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (
-      !checkMinimumDeliveryAmount() ||
-      !checkAddress() ||
-      !validateAddressBuffer() ||
-      !validateGuests() ||
-      !validatePhone() ||
-      !validateEmail() ||
-      !validatePayment(e)
-    )
-      return;
-    // console.log("first");
-    showAlert({
-      title: "Confirm Order",
-      description: `Are our sure, you want to ${
-        isValidOrderEdit ? `update order #${atob(saleId)}` : " an order"
-      } of amount <b>${currencyCode} ${totalOrderAmount?.toFixed(2)}</b>?`,
-      confirmText: isValidOrderEdit ? "Save Order" : "Place Order",
-      cancelText: "Cancel",
-      onConfirm: () => {
-        placeOrder();
-      },
-    });
-  };
+  const validateOrder = () =>
+    // e: React.MouseEvent<HTMLButtonElement>
+    {
+      if (
+        !checkMinimumDeliveryAmount() ||
+        !checkAddress() ||
+        !validateAddressBuffer() ||
+        // !validateGuests() ||
+        !validatePhone() ||
+        !validateEmail()
+        // ||
+        // !validatePayment(e)
+      )
+        return;
+      // console.log("first");
+      showAlert({
+        title: "Confirm Order",
+        description: `Are our sure, you want to ${
+          isValidOrderEdit
+            ? `update quotation #${atob(saleId)}`
+            : "place an quotation"
+        } of amount <b>${currencyCode} ${totalOrderAmount?.toFixed(2)}</b>?`,
+        confirmText: isValidOrderEdit ? "Save Quotation" : "Submit Quotation",
+        cancelText: "Cancel",
+        onConfirm: () => {
+          placeOrder();
+        },
+      });
+    };
   // console.log(order_products);
   const placeOrder = (paymentData?: string) => {
     const reqTime = moment().format("YYYY-MM-DDTHH:mm:ss");
 
     const kitchenTime = getMaxKitchenTime(items);
-    const readyTime =
-      orderInfo.orderType === 3 ? config?.orderReadyRequiredTimeInMin ?? 0 : 0;
+    const readyTime = config?.orderReadyRequiredTimeInMin ?? 0;
 
     const deliveryTime = moment(reqTime)
       .add(kitchenTime + readyTime, "minutes")
@@ -751,24 +749,24 @@ export default function PlaceOrder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, pathname]);
 
-  useEffect(() => {
-    if (isPaymentSuccess) placeOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPaymentSuccess]);
+  // useEffect(() => {
+  //   if (isPaymentSuccess) placeOrder();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isPaymentSuccess]);
 
   return (
     <div className="fixed lg:static bottom-0 left-0 right-0 bg-background p-2 border-t lg:border-t-0 lg:bg-transparent z-10 space-y-2">
-      {(isPending || loadingJC) && (
+      {isPending && (
         <Spinner
           text={isPending ? "Placing order..." : "Redirecting to jazzcash..."}
         />
       )}
-      <JCInitiateLoading isOpen={paymentInitiatedPending} />
+      {/* <JCInitiateLoading isOpen={paymentInitiatedPending} />
       <JazzCashConfirm
         ref={jazzCashRef}
         isVisible={isPaymentInitiated}
         placeOrder={placeOrder}
-      />
+      /> */}
       <div className="lg:hidden flex justify-between text-lg font-bold items-center">
         <div className="flex flex-col">
           <span>Total</span>
@@ -797,7 +795,7 @@ export default function PlaceOrder({
             Add More Items
           </Button>
         )}
-        {GooglePayButtonComponent}
+        {/* {GooglePayButtonComponent} */}
         <Button
           disabled={isFetching}
           className="flex-1 h-12"
@@ -810,9 +808,7 @@ export default function PlaceOrder({
               {isValidOrderEdit ? (
                 <span>Update Order</span>
               ) : (
-                <span>
-                  {orderInfo.paymentMethodId === 2 ? "Pay & " : ""}Place Order
-                </span>
+                <span>Submit</span>
               )}
             </>
           )}

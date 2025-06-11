@@ -3,7 +3,11 @@ import { useConfig } from "@/context/config-context";
 import { useLocation } from "@/context/location-context";
 import { useOrder } from "@/context/order-context";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
-import { getTaxAmount, getTotalOrderAmount } from "@/utils/cartUtils";
+import {
+  getMaxKitchenTime,
+  getTaxAmount,
+  getTotalOrderAmount,
+} from "@/utils/cartUtils";
 import { getDeliveryCoverageBuffer, getDistanceUnit } from "@/utils/storeUtils";
 import { MenuItemPricing } from "../menu/menu-item-pricing";
 import { ErrorState } from "../store/store-status";
@@ -11,6 +15,7 @@ import { Card, CardContent } from "../ui/card";
 import { Separator } from "../ui/separator";
 import { useLOV } from "@/context/lov-context";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
+import moment from "moment";
 
 const CheckoutSummary = () => {
   const { items, totalPrice } = useCart();
@@ -34,6 +39,14 @@ const CheckoutSummary = () => {
     />
   );
 
+  const kitchenTime = getMaxKitchenTime(items);
+  const readyTime = config?.orderReadyRequiredTimeInMin ?? 0;
+  const reqTime = moment().format("YYYY-MM-DDTHH:mm:ss");
+
+  const deliveryTime = moment(reqTime)
+    .add(kitchenTime + readyTime, "minutes")
+    .format("YYYY-MM-DDTHH:mm:ss");
+
   if (isError) return <ErrorState />;
 
   return (
@@ -48,6 +61,10 @@ const CheckoutSummary = () => {
         <p className="text-muted-foreground mb-4">
           {storeData?.store?.name} - {storeData?.store?.address}
         </p>
+        <p className="text-muted-foreground mb-4">
+          ETA - {moment(deliveryTime).format("ddd, MMM DD, h:mm A")}
+        </p>
+        <Separator />
         <div className="flex flex-col space-y-4">
           {items.map((item) => (
             <div className="flex justify-between" key={item.productDetailId}>
@@ -84,13 +101,13 @@ const CheckoutSummary = () => {
               <p>{getTaxAmount(totalPrice, config?.tax ?? 0)}</p>
             </div>
           )}
-          {orderInfo.orderType === 1 && (config?.serviceCharges ?? 0) > 0 && (
+          {(orderInfo.serviceCharges ?? 0) > 0 && (
             <div className="flex justify-between">
               <p>Service Charges</p>
-              <p>{getTaxAmount(totalPrice, config?.serviceCharges ?? 0)}</p>
+              <p>{orderInfo.serviceCharges?.toFixed(2)}</p>
             </div>
           )}
-          {orderInfo.orderType === 3 && orderInfo.deliveryCharges > 0 && (
+          {orderInfo.deliveryCharges > 0 && (
             <div className="flex justify-between">
               <p>
                 Delivery Charges{" "}

@@ -27,18 +27,13 @@ export const useGetDistance = (
   long1: number,
   lat1: number,
   long2: number,
-  lat2: number,
-  orderType: number
+  lat2: number
+  // orderType: number
 ) => {
   return useQuery({
     queryKey: [QUERY_KEYS.DISTANCE, long1, lat1, long2, lat2],
     queryFn: () => mapService.getDistance(long1, lat1, long2, lat2),
-    enabled:
-      Boolean(lat1) &&
-      Boolean(long1) &&
-      Boolean(lat2) &&
-      Boolean(long2) &&
-      orderType === 3,
+    enabled: Boolean(lat1) && Boolean(long1) && Boolean(lat2) && Boolean(long2),
     staleTime: 6 * 60 * 60 * 1000, // cache for 6 hours
   });
 };

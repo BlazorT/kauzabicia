@@ -33,7 +33,7 @@ export const CategoryNav = ({
 }: CategoryNavProps) => {
   return (
     <div className="sticky top-0 bg-background shadow-sm z-10">
-      <div className="relative container lg:max-w-[90rem] mx-auto px-0">
+      <div className="relative mx-auto px-0">
         {canScrollLeft && (
           <Button
             size="icon"

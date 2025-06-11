@@ -44,8 +44,10 @@ export default function OrderCustomer({
 
   return (
     <CollapsibleCard
+      isCollapsible={false}
       ref={customerCollapsibleRef as RefObject<COLLAPSIBLE_REF>}
       showHelperText={false}
+      initialOpen
       header={
         <div className="flex items-center gap-2">
           <User />
@@ -76,10 +78,7 @@ export default function OrderCustomer({
           inputMode="numeric" // improves UX on mobile
           pattern="[0-9]*" // allows only digits
           maxLength={13} // HTML-level safeguard
-          required={orderInfo.orderType === 3}
-          className={`flex-1/2 ${
-            orderInfo.orderType === 3 ? "placeholder:text-red-400" : ""
-          } `}
+          className={`flex-1/2 ${"placeholder:text-red-400"} `}
         />
 
         <div className="flex flex-1/2 flex-col gap-2">
@@ -98,7 +97,27 @@ export default function OrderCustomer({
             </p>
           )}
         </div>
+        {!isEmailValid && (
+          <p className="text-sm text-red-500">
+            Please enter a valid email address.
+          </p>
+        )}
       </div>
+      <Input
+        id="whatsApp"
+        placeholder="Whatsapp"
+        value={orderInfo.whatsApp}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value.length <= 13) {
+            setOrderInfo((prev) => ({ ...prev, whatsApp: value }));
+          }
+        }}
+        type="tel" // more appropriate for phone numbers
+        inputMode="numeric" // improves UX on mobile
+        pattern="[0-9]*" // allows only digits
+        maxLength={13} // HTML-level safeguard
+      />
     </CollapsibleCard>
   );
 }

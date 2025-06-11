@@ -89,7 +89,7 @@ export const MenuItem = ({
     setIsMenuItemDetailsOpen(!isMenuItemDetailsOpen);
   };
 
-  // console.log({ item });
+  // console.log({ item: item.menuJSON, id: item.productname });
   return (
     <>
       <Card className="px-2 py-2">

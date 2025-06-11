@@ -13,7 +13,7 @@ const SignUp = () => {
       <Card className="flex flex-col items-center bg-background justify-center min-h-screen px-4 rounded-none">
         <CardContent className="w-full max-w-md bg-card p-6 flex flex-col gap-4 rounded-3xl border-1">
           {/* <div className="flex justify-center">
-            <Image src="/logo.png" alt="Blazor Logo" width={100} height={24} />
+            <Image src="/logo.jpeg" alt="Blazor Logo" width={100} height={24} />
           </div> */}
           <h1 className="text-2xl text-center sm:text-3xl">Sign Up!</h1>
           <SignUpForm />

@@ -127,3 +127,6 @@ export const STATUS = {
 export const COMPANY_NAME = "Mealz N Dealz, Powered By Blazor Technologies Inc";
 export const MAX_PRICE = 90000;
 export const MIN_PRICE = 1;
+export const IMAGE_MIN = 400;
+export const IMAGE_MAX = 1300;
+export const DEFAULT_STORE_ID = 1;

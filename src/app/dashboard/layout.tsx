@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -46,16 +46,22 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                     .replace(/\b\w/g, (char) => char.toUpperCase());
 
                   return (
-                    <BreadcrumbItem key={href}>
-                      {isLast ? (
-                        <BreadcrumbPage>{formatted}</BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink href={href} asChild>
-                          <Link href={href}>{formatted}</Link>
-                        </BreadcrumbLink>
-                      )}
+                    // Use React.Fragment to group the item and separator
+                    // This ensures both BreadcrumbItem (<li>) and BreadcrumbSeparator (likely <li> or <span>)
+                    // are direct children of BreadcrumbList (<ol>), preventing nested <li> tags.
+                    <React.Fragment key={href}>
+                      <BreadcrumbItem>
+                        {isLast ? (
+                          <BreadcrumbPage>{formatted}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={href} asChild>
+                            <Link href={href}>{formatted}</Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {/* Only render the separator if it's not the last item */}
                       {!isLast && <BreadcrumbSeparator />}
-                    </BreadcrumbItem>
+                    </React.Fragment>
                   );
                 })}
               </BreadcrumbList>

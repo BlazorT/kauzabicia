@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/store/StoreInfo/components/StoreHeader.tsx
 import { Button } from "@/components/ui/button";
+import { useLOV } from "@/context/lov-context";
 import { useAddToFavorite } from "@/hooks/useMenu";
 import { cn } from "@/lib/utils";
 import { API_URL } from "@/services/apiClient";
@@ -27,10 +28,6 @@ import StoreConfig from "./store-config";
 import { StoreHours } from "./store-hours";
 import { StoreLocation } from "./store-location";
 import { StoreRating } from "./store-rating";
-import { useLOV } from "@/context/lov-context";
-import HeaderProfile from "../home/heder-profile";
-import { useAuth } from "@/context/auth-context";
-import { USER_ROLE } from "@/constants/constants";
 
 interface StoreHeaderProps {
   name: string;
@@ -76,7 +73,6 @@ export const StoreHeader = ({
     isStoreOpen: false,
   };
   const { lovs } = useLOV();
-  const { user } = useAuth();
 
   const [favStores, setFavStores] = useState<{
     [key: number]: { isFav: boolean };
@@ -249,7 +245,7 @@ export const StoreHeader = ({
             )}
           </Button>
           <ExportMenu />
-          {user && user?.roleId !== USER_ROLE.USER && <HeaderProfile />}
+          {/* {user && user?.roleId !== USER_ROLE.USER && <HeaderProfile />} */}
         </div>
 
         {showDetails && (

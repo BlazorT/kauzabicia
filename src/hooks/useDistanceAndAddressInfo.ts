@@ -17,7 +17,7 @@ import polyline from "@mapbox/polyline";
 import { useEffect } from "react";
 
 export const useDistanceAndAddressInfo = () => {
-  const { setOrderInfo, orderInfo } = useOrder();
+  const { setOrderInfo } = useOrder();
   const { config } = useConfig();
   const { userLocation, ipInfo, selectedPosition } = useLocation();
   const { items } = useCart();
@@ -35,8 +35,8 @@ export const useDistanceAndAddressInfo = () => {
     mapCoords?.longitude ?? 0,
     mapCoords?.latitude ?? 0,
     selectedPosition?.[1] ?? 0,
-    selectedPosition?.[0] ?? 0,
-    orderInfo?.orderType ?? 0
+    selectedPosition?.[0] ?? 0
+    // orderInfo?.orderType ?? 0
   );
 
   const showWarning = () => {
@@ -53,7 +53,7 @@ export const useDistanceAndAddressInfo = () => {
   };
 
   useEffect(() => {
-    if (data && orderInfo.orderType === 3) {
+    if (data) {
       // console.log({ data });
       const distance = data?.routes[0]?.distance ?? 0;
       const isValid = isDistanceBufferValid(
@@ -85,7 +85,7 @@ export const useDistanceAndAddressInfo = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, config, ipInfo, storeData, orderInfo.orderType, filters?.country]);
+  }, [data, config, ipInfo, storeData, filters?.country]);
 
   useEffect(() => {
     if (addressData) {

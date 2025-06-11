@@ -29,13 +29,13 @@ const CartSummary = () => {
             <p> {getTaxAmount(totalPrice, config?.tax ?? 0)}</p>
           </div>
         )}
-        {orderInfo.orderType === 1 && (config?.serviceCharges ?? 0) > 0 && (
+        {(orderInfo.serviceCharges ?? 0) > 0 && (
           <div className="flex justify-between">
             <p>Service Charges</p>
-            <p> {getTaxAmount(totalPrice, config?.serviceCharges ?? 0)}</p>
+            <p> {orderInfo.serviceCharges?.toFixed(2)}</p>
           </div>
         )}
-        {orderInfo.orderType === 3 && orderInfo.deliveryCharges > 0 && (
+        {orderInfo.deliveryCharges > 0 && (
           <div className="flex justify-between">
             <p>Delivery Charges</p>
             <p>{orderInfo.deliveryCharges.toFixed(2)}</p>

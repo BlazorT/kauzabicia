@@ -18,13 +18,11 @@ export const getTotalOrderAmount = (
   let pointsDiscount = 0;
   let tipAmount = 0;
   taxAmount = parseFloat(getTaxAmount(price, config.tax ?? 0));
-  if (orderInfo.orderType === 1) {
-    serviceCharges = parseFloat(
-      getTaxAmount(price, config.serviceCharges ?? 0)
-    );
-  }
-  if (orderInfo.orderType === 3 && orderInfo.deliveryCharges > 0) {
+  if (orderInfo.deliveryCharges > 0) {
     deliveryCharges = orderInfo.deliveryCharges;
+  }
+  if (orderInfo.serviceCharges > 0) {
+    serviceCharges = orderInfo.serviceCharges;
   }
   if (orderInfo.voucherDiscount > 0) {
     voucherDiscount = orderInfo.voucherDiscount;

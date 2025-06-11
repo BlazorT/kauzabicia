@@ -1,9 +1,16 @@
-import { API_URL } from "@/services/apiClient";
+import { getImageUrlsFromVariation } from "@/utils/menuUtils";
 import { MenuItem } from "@/utils/types";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
+import Captions from "yet-another-react-lightbox/plugins/captions";
+import "yet-another-react-lightbox/plugins/captions.css";
+import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
+import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import {
   Carousel,
@@ -18,11 +25,6 @@ import MenuItemOptions from "./menu-item-options";
 import { MenuItemPricing } from "./menu-item-pricing";
 import { MenuItemTags } from "./menu-item-tags";
 import MostBoughtTogether from "./menu-most-bought";
-import Captions from "yet-another-react-lightbox/plugins/captions";
-import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
-import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 // Add custom styles for lightbox
 
@@ -39,14 +41,12 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
   toggleMenuItemDetails,
   isStoreOpen,
 }) => {
-  const [imageError, setImageError] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
   );
   const [selectedVariation, setSelectedVariation] = useState<MenuItem>();
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [totalItems, setTotalItems] = useState(5);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -65,7 +65,6 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
 
     const updateCarouselState = () => {
       setCurrentIndex(carouselApi.selectedScrollSnap());
-      setTotalItems(carouselApi.scrollSnapList().length);
     };
 
     updateCarouselState();
@@ -78,14 +77,8 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
   }, [carouselApi]);
 
   useEffect(() => {
-    if (selectedVariation) {
-      // Create an array of image URLs
-      const urls = Array.from({ length: 5 }).map(() =>
-        imageError ? "/no-image.png" : API_URL + selectedVariation.producturl
-      );
-      setImageUrls(urls);
-    }
-  }, [selectedVariation, imageError]);
+    setImageUrls(getImageUrlsFromVariation(selectedVariation));
+  }, [selectedVariation]);
 
   const scrollToIndex = (index: number) => {
     carouselApi?.scrollTo(index);
@@ -94,7 +87,6 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
   const dimensions = 54;
 
   if (!selectedVariation) return null;
-  // console.log({ imageUrls });
   return (
     <>
       <DialogContent
@@ -130,7 +122,6 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
                     width={dimensions}
                     height={dimensions}
                     className="object-contain w-full h-60"
-                    onError={() => setImageError(true)}
                   />
                   <div className="absolute top-2 left-2">
                     <MenuItemTags
@@ -158,17 +149,21 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute bottom-[-12px] left-0 right-0 flex justify-center space-x-2 z-20">
-            {Array.from({ length: totalItems }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollToIndex(index)}
-                className={`w-3 h-3 rounded-full ${
-                  currentIndex === index ? "bg-primary" : "bg-muted-foreground"
-                }`}
-              />
-            ))}
-          </div>
+          {imageUrls?.length > 1 && (
+            <div className="absolute bottom-[-12px] left-0 right-0 flex justify-center space-x-2 z-20">
+              {imageUrls.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToIndex(index)}
+                  className={`w-3 h-3 rounded-full ${
+                    currentIndex === index
+                      ? "bg-primary"
+                      : "bg-muted-foreground"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </Carousel>
 
         <div className="px-4 space-y-2 py-1">

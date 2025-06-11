@@ -3,13 +3,20 @@ import { QUERY_KEYS } from "@/utils/queryKeys";
 import { STORE_FILTERS_BODY } from "@/utils/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useMenu = (storeId: string, dateFrom?: string) => {
+export const useMenu = (
+  storeId: string,
+  dateFrom?: string,
+  productDetailId?: string,
+  status: string = "1"
+) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.MENU, storeId],
+    queryKey: [QUERY_KEYS.MENU, storeId, productDetailId ?? "0"],
     queryFn: () =>
       menuService.getMenu({
         storeId,
         dateFrom: dateFrom ?? new Date().toISOString(),
+        id: productDetailId ?? "0",
+        status,
       }),
     enabled: Boolean(storeId),
     staleTime: 1 * 60 * 1000, // 5 minutes: data is fresh for this duration
@@ -88,6 +95,16 @@ export const useGetAllMenus = (storeId?: number) => {
   return useQuery({
     queryKey: [QUERY_KEYS.ALL_MENUS],
     queryFn: () => menuService.getAllMenus(storeId),
+    staleTime: 30 * 60 * 1000, // 5 minutes: data is fresh for this duration
+    refetchInterval: 30 * 60 * 1000, // refetch every 5 minutes
+    refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
+  });
+};
+
+export const useGetStoreProducts = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.STORE_PRODUCTS],
+    queryFn: () => menuService.getStoreProducts(),
     staleTime: 30 * 60 * 1000, // 5 minutes: data is fresh for this duration
     refetchInterval: 30 * 60 * 1000, // refetch every 5 minutes
     refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background

@@ -387,6 +387,8 @@ export type MENU_FORM = {
   id: string;
   storeId: string;
   dateFrom: Date | string;
+  productDetailId?: string;
+  status?: string;
 };
 
 export type FORGOT_PASSWORD_FORM = {
@@ -470,6 +472,7 @@ export interface MenuItem {
   id: number;
   linediscount: number;
   productId: number;
+  barcode: string;
   productDetailId: number;
   productname: string;
   description: string;
@@ -493,6 +496,12 @@ export interface MenuItem {
   productOptionsJSON: string;
   tax: number;
   kitchenTimeInMins: number;
+  unitId: number;
+  lastUpdatedAt: string;
+  createdAt: string;
+  createdBy: number;
+  lastUpdatedBy: number;
+  menuJSON: string;
   /** List of all variations for this product */
   variations?: MenuItem[];
 }

@@ -1,17 +1,24 @@
 "use client";
+import { IMAGE_MAX, IMAGE_MIN, STATUS } from "@/constants/constants";
+import { useAlert } from "@/context/alert-context";
 import { useAuth } from "@/context/auth-context";
 import { useUploadMultiImages } from "@/hooks/useAuth"; // Assuming useUploadImage is still relevant for product images
 import {
   useAddUpdateProduct,
   useGetStoreMenus,
   useGetUnits,
+  useMenu,
 } from "@/hooks/useMenu";
 import { cn } from "@/lib/utils";
+import { QUERY_KEYS } from "@/utils/queryKeys";
+import { MenuItem, RESPONSE } from "@/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   ChevronsUpDown,
   Clock,
+  Code,
   DollarSign,
   Info,
   Loader2,
@@ -21,8 +28,10 @@ import {
   Upload,
   X,
 } from "lucide-react"; // Import new icons
+import moment from "moment";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -48,10 +57,7 @@ import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea"; // Assuming you have a Textarea component
-import { useRouter } from "next/navigation";
-import { RESPONSE } from "@/utils/types";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/utils/queryKeys";
+import Spinner from "../ui/spinner";
 interface ProductUnit {
   createdAt: string;
   createdBy: number;
@@ -111,6 +117,7 @@ const formSchema = z.object({
     .string()
     .max(300, "Description cannot exceed 300 characters")
     .optional(),
+  code: z.string().max(20, "Code cannot exceed 20 characters").optional(),
   images: z
     .array(
       z.object({
@@ -138,10 +145,10 @@ const formSchema = z.object({
               img.src = file.preview;
               img.onload = () => {
                 if (
-                  img.width >= 400 &&
-                  img.width <= 1300 &&
-                  img.height >= 400 &&
-                  img.height <= 1300
+                  img.width >= IMAGE_MIN &&
+                  img.width <= IMAGE_MAX &&
+                  img.height >= IMAGE_MIN &&
+                  img.height <= IMAGE_MAX
                 ) {
                   resolve(true);
                 } else {
@@ -156,7 +163,17 @@ const formSchema = z.object({
 });
 
 const ProductSettingForm = () => {
-  //   const { showAlert } = useAlert();
+  const { showAlert } = useAlert();
+  const searchParams = useSearchParams();
+
+  const productDetailId = searchParams.get("id");
+
+  const { data: menuResponse, isLoading: isPending } = useMenu(
+    productDetailId ? "1" : "",
+    moment().format("YYYY-MM-DDTHH:mm:ss"),
+    productDetailId ?? ""
+  );
+  const updating_product = (menuResponse?.data as MenuItem[])?.[0] ?? null;
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: uploadImage, isPending: isPendingImageUpload } =
@@ -189,53 +206,31 @@ const ProductSettingForm = () => {
       status: 1, // Default to active
       description: "",
       images: [],
+      code: "",
     },
   });
 
-  //   const unitPrice = form.watch("unitPrice");
-  //   const discountAmount = form.watch("discount");
-  //   const discountPercentage = form.watch("discountPercent");
-  //   const unitId = form.watch("unitId");
-  //   const productId = form.watch("productId");
-  //   const status = form.watch("status");
-  //   const readyTime = form.watch("readyTime");
-  //   const taxPercent = form.watch("taxPercent");
+  useEffect(() => {
+    if (!updating_product) return;
+    form.setValue("productId", updating_product?.productId?.toString());
+    form.setValue("unitId", updating_product?.unitId?.toString());
+    form.setValue(
+      "unitPrice",
+      parseFloat(updating_product?.unitprice?.toFixed(2))
+    );
+    form.setValue(
+      "discount",
+      parseFloat(updating_product?.linediscount?.toFixed(2))
+    );
+    form.setValue("taxPercent", parseFloat(updating_product?.tax?.toFixed(2)));
+    form.setValue("readyTime", updating_product?.kitchenTimeInMins);
+    form.setValue("description", updating_product?.description);
+    form.setValue("code", updating_product?.barcode);
+  }, [updating_product, form]);
 
-  //   console.log({
-  //     unitPrice,
-  //     discountAmount,
-  //     discountPercentage,
-  //     readyTime,
-  //     status,
-  //     productId,
-  //     unitId,
-  //     taxPercent,
-  //   });
-
-  //   // Effect to handle inverse calculation of discount fields
-  //   useEffect(() => {
-  //     // If discount amount is being edited
-  //     if (unitPrice > 0 && typeof discountAmount === "number") {
-  //       const calculatedPercent = (discountAmount / unitPrice) * 100;
-  //       form.setValue(
-  //         "discountPercent",
-  //         parseFloat(calculatedPercent.toFixed(2)),
-  //         {
-  //           shouldValidate: true,
-  //         }
-  //       );
-  //     }
-  //   }, [discountAmount, unitPrice, form]);
-
-  //   useEffect(() => {
-  //     // If discount percentage is being edited
-  //     if (unitPrice > 0 && typeof discountPercentage === "number") {
-  //       const calculatedAmount = (discountPercentage / 100) * unitPrice;
-  //       form.setValue("discount", parseFloat(calculatedAmount.toFixed(2)), {
-  //         shouldValidate: true,
-  //       });
-  //     }
-  //   }, [discountPercentage, unitPrice, form]);
+  const unitPrice = form.watch("unitPrice");
+  // const discount = form.watch("discount");
+  // const discountPercent = form.watch("discountPercent");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -262,10 +257,10 @@ const ProductSettingForm = () => {
           img.onload = () => {
             // Validate dimensions
             if (
-              img.width >= 400 &&
-              img.width <= 1300 &&
-              img.height >= 400 &&
-              img.height <= 1300
+              img.width >= IMAGE_MIN &&
+              img.width <= IMAGE_MAX &&
+              img.height >= IMAGE_MIN &&
+              img.height <= IMAGE_MAX
             ) {
               newImagePreviews.push({ file, preview });
             } else {
@@ -310,11 +305,10 @@ const ProductSettingForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Handle image uploads first
-    console.log({ values });
     // Now, handle the product data submission with the uploaded image URLs
     const productData = {
-      id: 0,
-      Barcode: "",
+      Id: updating_product?.productDetailId ?? 0,
+      Barcode: values.code,
       ProductId: parseInt(values.productId),
       StoreId: 1,
       UnitId: parseInt(values.unitId),
@@ -326,17 +320,24 @@ const ProductSettingForm = () => {
       KitchenTimeInMins: values.readyTime,
       status: values.status,
       Description: values.description,
-      Producturl: "",
+      Producturl: updating_product?.producturl ?? "",
       RowVer: 1,
+      createdAt: moment().utc().format(),
+      lastUpdatedAt: moment().utc().format(),
+      createdBy: user?.id,
+      lastUpdatedBy: user?.id,
     };
 
-    console.log("Submitting Product Data:", productData);
+    // console.log("Submitting Product Data:", productData);
+    // console.log(JSON.stringify(productData));
 
     mutate(productData, {
       onSuccess: async (res) => {
-        console.log(res);
+        // console.log(res);
         if (res?.status == true) {
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STORE_MENUS] });
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.MENU, "1", "0"],
+          });
           toast.success(res?.message);
           const message = res?.message ?? "";
           const regex = /#(\d+)/; // Matches '#' followed by one or more digits
@@ -358,6 +359,7 @@ const ProductSettingForm = () => {
             formData.append("id", productId); // Append the room ID
             formData.append("userid", user?.id?.toString() ?? "0"); // Append the user ID
             formData.append("remarks", ""); // Append remarks
+            console.log(formData);
             if (values.images.length > 0) {
               try {
                 const res: RESPONSE = await new Promise((resolve, reject) => {
@@ -374,7 +376,7 @@ const ProductSettingForm = () => {
                     const cleanedFilePath = "/" + urlPath.replace(/\\/g, "/"); // Replace backslashes with forward slashes
                     uploadedImageUrls.push(cleanedFilePath);
                   });
-                  router.replace("/dashboard/menu");
+                  router.replace("/dashboard/products");
                 } else {
                   // If res.data is not an array or is missing, log an error and stop
                   toast.error(
@@ -390,9 +392,14 @@ const ProductSettingForm = () => {
             }
             toast.success("Product form submitted! (Check console for data)");
           } else {
-            router.replace("/dashboard/menu");
+            router.replace("/dashboard/products");
           }
         } else {
+          showAlert({
+            title: "Error",
+            description: `${res?.message ?? STATUS.SERVER_ERROR}`,
+            confirmText: "OK",
+          });
           console.log("Product ID not found in the message.");
         }
       },
@@ -404,6 +411,7 @@ const ProductSettingForm = () => {
   //   console.log(form.formState.errors);
   return (
     <Form {...form}>
+      {isPending && <Spinner />}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         onError={(e) => console.log({ e })}
@@ -416,7 +424,7 @@ const ProductSettingForm = () => {
             name="productId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Code</FormLabel>
+                <FormLabel>Product</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Popover>
@@ -460,7 +468,6 @@ const ProductSettingForm = () => {
                                     value={product.name}
                                     key={product.productId}
                                     onSelect={() => {
-                                      console.log(product);
                                       form.setValue(
                                         "productId",
                                         product.productId?.toString()
@@ -564,9 +571,31 @@ const ProductSettingForm = () => {
             )}
           />
         </div>
-
         {/* Pricing and Discount */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Code</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Code className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Product Code"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                      }}
+                      className="pl-9"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="unitPrice"
@@ -581,6 +610,31 @@ const ProductSettingForm = () => {
                       step="0.01"
                       placeholder="Unit Price"
                       {...field}
+                      onChange={(e) => {
+                        field.onChange(parseFloat(e.target.value));
+                      }}
+                      className="pl-9"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="taxPercent"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tax %</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Tax Percentage"
+                      {...field}
                       onChange={(e) =>
                         field.onChange(parseFloat(e.target.value))
                       }
@@ -592,6 +646,9 @@ const ProductSettingForm = () => {
               </FormItem>
             )}
           />
+        </div>
+        {/* Tax, Ready Time, Status */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="discount"
@@ -606,9 +663,21 @@ const ProductSettingForm = () => {
                       step="0.01"
                       placeholder="Discount Amount"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
+                      onChange={(e) => {
+                        if (unitPrice > 0) {
+                          const calculatedPercent =
+                            (parseFloat(e.target.value) / unitPrice) * 100;
+
+                          form.setValue(
+                            "discountPercent",
+                            parseFloat(calculatedPercent.toFixed(2)),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                        }
+                        field.onChange(parseFloat(e.target.value));
+                      }}
                       className="pl-9"
                     />
                   </div>
@@ -631,38 +700,21 @@ const ProductSettingForm = () => {
                       step="0.01"
                       placeholder="Discount Percentage"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
-                      className="pl-9"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                      onChange={(e) => {
+                        if (unitPrice > 0) {
+                          const calculatedAmount =
+                            (parseFloat(e.target.value) / 100) * unitPrice;
 
-        {/* Tax, Ready Time, Status */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="taxPercent"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tax %</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Tax Percentage"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
+                          form.setValue(
+                            "discount",
+                            parseFloat(calculatedAmount.toFixed(2)),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                        }
+                        field.onChange(parseFloat(e.target.value));
+                      }}
                       className="pl-9"
                     />
                   </div>
@@ -693,6 +745,30 @@ const ProductSettingForm = () => {
               </FormItem>
             )}
           />
+        </div>
+        {/* Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Info className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
+                  <Textarea
+                    placeholder="Provide a detailed description of the product (max 300 characters)"
+                    {...field}
+                    className="min-h-[80px] pl-9 resize-y"
+                    maxLength={300}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />{" "}
+        <div className="flex justify-center items-center">
           <FormField
             control={form.control}
             name="status"
@@ -726,30 +802,6 @@ const ProductSettingForm = () => {
             )}
           />
         </div>
-
-        {/* Description */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Info className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
-                  <Textarea
-                    placeholder="Provide a detailed description of the product (max 300 characters)"
-                    {...field}
-                    className="min-h-[80px] pl-9 resize-y"
-                    maxLength={300}
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Image Upload */}
         <FormItem>
           <FormLabel>Product Images (Min 5)</FormLabel>
@@ -803,7 +855,6 @@ const ProductSettingForm = () => {
           </div>
           <FormMessage /> {/* Display Zod errors for images */}
         </FormItem>
-
         <Button
           type="submit"
           className="w-full"
@@ -816,7 +867,7 @@ const ProductSettingForm = () => {
           {(form.formState.isSubmitting ||
             isPendingImageUpload ||
             isPendingAddUpdate) && <Loader2 className="animate-spin mr-2" />}
-          Save Product
+          {updating_product ? "Update Product" : "Save Product"}
         </Button>
       </form>
     </Form>
