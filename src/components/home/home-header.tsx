@@ -11,7 +11,7 @@ interface HomeHeaderProps {
 const HomeHeader: React.FC<HomeHeaderProps> = ({ setSearchQuery }) => {
   return (
     // Main container: column on small, row on large
-    <div className="flex flex-col lg:flex-row items-center justify-between w-full">
+    <div className="flex flex-col lg:flex-row items-center justify-between xl:me-22">
       {/* Layout for small screens */}
       <div className="flex lg:hidden items-center justify-between w-full">
         <HeaderProfile /> {/* Left */}

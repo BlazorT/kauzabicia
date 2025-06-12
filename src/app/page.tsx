@@ -18,7 +18,7 @@ const Home = () => {
   return (
     <div className="container mx-auto my-0">
       {/* Fixed Header */}
-      <div className="fixed container mx-auto my-0 py-2 top-0 left-0 right-0 z-30 bg-background xl:px-0">
+      <div className="fixed container mx-auto  my-0 py-2 top-0 left-0 right-0 z-30 bg-background xl:px-0">
         <HomeHeader setSearchQuery={setSearchQuery} />
       </div>
 

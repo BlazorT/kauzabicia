@@ -103,7 +103,7 @@ const HomeStores: React.FC<HomeStoresProps> = ({
           )}
         </button>
       </div>
-      <div>
+      <div className="sticky top-0 z-50">
         {filteredMenu.length > 1 && (
           <CategoryNav
             categories={filteredMenu}
