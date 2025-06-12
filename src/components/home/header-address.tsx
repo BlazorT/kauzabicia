@@ -6,10 +6,9 @@ import { DialogProps } from "@/utils/types";
 import { MapPin } from "lucide-react";
 import { useEffect } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import HomeMapFilters from "./home-map-filters";
 
 const HeaderAddress: React.FC<DialogProps> = ({
-  isMapVisible,
+  // isMapVisible,
   toggleIsMapVisble,
 }) => {
   const { filters, updateFilter } = useRestaurantFilters();
@@ -45,10 +44,10 @@ const HeaderAddress: React.FC<DialogProps> = ({
           </TooltipContent>
         </Tooltip>
       </div>
-      <HomeMapFilters
+      {/* <HomeMapFilters
         isVisible={isMapVisible}
         toggleVisible={toggleIsMapVisble}
-      />
+      /> */}
     </>
   );
 };
