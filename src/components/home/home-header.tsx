@@ -1,10 +1,14 @@
-import { DialogProps } from "@/utils/types";
+import { SearchBar } from "../menu/search-bar";
 import { ModeToggle } from "../ui/theme-menu";
 import HeaderCart from "./header-cart";
 import HeaderLogo from "./header-logo";
 import HeaderProfile from "./heder-profile";
 
-const HomeHeader: React.FC<DialogProps> = ({}) => {
+interface HomeHeaderProps {
+  setSearchQuery: (value: string) => void;
+}
+
+const HomeHeader: React.FC<HomeHeaderProps> = ({ setSearchQuery }) => {
   return (
     // Main container: column on small, row on large
     <div className="flex flex-col lg:flex-row items-center justify-between w-full">
@@ -22,6 +26,11 @@ const HomeHeader: React.FC<DialogProps> = ({}) => {
       {/* Layout for large screens */}
       <div className="hidden lg:flex items-center justify-between w-full">
         <HeaderLogo /> {/* Left */}
+        <SearchBar
+          onSearch={setSearchQuery}
+          placeholder="Search Products..."
+          className="max-w-100"
+        />
         {/* <HeaderAddress
           isMapVisible={isMapVisible}
           toggleIsMapVisble={toggleIsMapVisble}

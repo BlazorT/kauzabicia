@@ -11,19 +11,15 @@ import { useState } from "react";
 const Home = () => {
   const { clearAllFilters, filterCount } = useRestaurantFilters();
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [isMapVisible, setIsMapVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const toggleIsMapVisble = () => setIsMapVisible((prev) => !prev);
   const toggleFilterSheet = () => setIsFilterSheetOpen(!isFilterSheetOpen);
 
   return (
     <div className="container mx-auto my-0">
       {/* Fixed Header */}
-      <div className="fixed container mx-auto py-2 top-0 left-0 right-0 z-30 bg-background px-2 xl:px-0">
-        <HomeHeader
-          isMapVisible={isMapVisible}
-          toggleIsMapVisble={toggleIsMapVisble}
-        />
+      <div className="fixed container mx-auto my-0 py-2 top-0 left-0 right-0 z-30 bg-background xl:px-0">
+        <HomeHeader setSearchQuery={setSearchQuery} />
       </div>
 
       {/* Main Content */}
@@ -39,7 +35,8 @@ const Home = () => {
         <div className="w-full lg:w-3/4">
           <HomeStores
             toggleFilterSheet={toggleFilterSheet}
-            toggleIsMapVisble={toggleIsMapVisble}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
           />
         </div>
       </div>

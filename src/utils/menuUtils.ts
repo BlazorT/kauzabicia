@@ -84,6 +84,35 @@ export const organizeMenuByCategory = (
     .sort((a, b) => a.name.localeCompare(b.name));
 };
 
+export const organizeMenuByCategoryFlat = (
+  menuItems: MenuItemType[]
+): MenuCategory[] => {
+  if (!Array.isArray(menuItems)) return [];
+
+  // Group items by category
+  const categoriesMap: Record<
+    number,
+    { id: number; name: string; items: MenuItemType[] }
+  > = {};
+
+  menuItems.forEach((item) => {
+    if (!categoriesMap[item.categoryid]) {
+      categoriesMap[item.categoryid] = {
+        id: item.categoryid,
+        name: item.productcategory,
+        items: [],
+      };
+    }
+    // Directly push the item without any variation processing
+    categoriesMap[item.categoryid].items.push(item);
+  });
+
+  // Convert the map to an array and sort categories by name
+  return Object.values(categoriesMap).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+};
+
 export const getItemDiscount = (product: MenuItemType) => {
   let discountedPrice = 0;
 

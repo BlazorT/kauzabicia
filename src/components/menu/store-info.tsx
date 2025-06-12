@@ -36,7 +36,7 @@ export const StoreInfo = ({ storeId, handleSearch }: StoreInfoProps) => {
           as={"h2"}
           toggleDetails={toggleDetails}
           showDetails={showDetails}
-          size={showDetails ? "md" : "sm"}
+          size={showDetails ? "lg" : "md"}
           store={store}
           storeData={storeData}
           handleSearch={handleSearch}

@@ -28,9 +28,9 @@ const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
   const onRestaurantClick = () => {
     if (!user) {
       showAlert({
-        title: "Heads Up!",
+        title: "Sign In!",
         description:
-          "To access and proceed with your quotations, please sign in. It only takes a moment!",
+          "To see more details or for detailed view, your need login, please sign in and proceed!",
         confirmText: "Sign In Now",
         onConfirm: () => router.push(`/auth/signin`),
         cancelText: "Cancel",
@@ -82,7 +82,9 @@ const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
     );
   };
 
-  const onAddItem = () => {
+  const onAddItem = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the card's onClick from firing
+
     addItem(store);
     toast.success(
       `${store.productname} - ${store?.unitname} has been added to cart successfully.`

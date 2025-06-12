@@ -509,7 +509,7 @@ export interface MenuItem {
 export interface MenuCategory {
   id: number;
   name: string;
-  items: MenuItem[] | DealItem[];
+  items: MenuItem[];
 }
 
 export type TipOption = {

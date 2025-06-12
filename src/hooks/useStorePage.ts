@@ -1,13 +1,13 @@
 // src/app/[storeId]/hooks/useStorePage.ts
-import { useGetDealz, useMenu } from "@/hooks/useMenu";
+import { USER_ROLE } from "@/constants/constants";
+import { useAuth } from "@/context/auth-context";
+import { useMenu } from "@/hooks/useMenu";
+import { MenuItem, OrderProduct } from "@/utils/types";
+import moment from "moment";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { organizeMenuByCategory } from "../utils/menuUtils";
-import moment from "moment";
-import { DealItem, MenuItem, OrderProduct } from "@/utils/types";
 import { useFetchOrderDetails } from "./useOrder";
-import { useAuth } from "@/context/auth-context";
-import { USER_ROLE } from "@/constants/constants";
 
 export const useStorePage = (id?: string) => {
   const params = useParams();
@@ -77,9 +77,6 @@ export const useStorePage = (id?: string) => {
     isError,
   } = useMenu(validStoreId, moment().format("YYYY-MM-DDTHH:mm:ss"));
 
-  const { data: dealResponse, isLoading: isDealsLoading } = useGetDealz(
-    parseInt(validStoreId)
-  );
   // console.log({ menuResponse });
   const { data: orderDetailRes } = useFetchOrderDetails(
     saleId ? saleId?.toString() : null
@@ -103,17 +100,9 @@ export const useStorePage = (id?: string) => {
       return [];
 
     const categorized = organizeMenuByCategory(menuResponse.data as MenuItem[]);
-    const deals = (dealResponse?.data as DealItem[]) ?? [];
-    if (deals.length > 0) {
-      categorized.unshift({
-        id: Math.floor(100000 + Math.random() * 900000),
-        name: "Deals",
-        items: deals,
-      });
-    }
 
     return categorized;
-  }, [menuResponse?.data, dealResponse?.data]);
+  }, [menuResponse?.data]);
 
   const mostlyBoughtTogetherItems = useMemo(() => {
     if (!menuResponse?.data || !Array.isArray(menuResponse.data)) return [];
@@ -213,7 +202,7 @@ export const useStorePage = (id?: string) => {
   return {
     storeId: validStoreId,
     categorizedMenu,
-    isLoading: isLoading || isDealsLoading,
+    isLoading: isLoading,
     isError,
     activeCategory,
     setActiveCategory,
