@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { useAlert } from "@/context/alert-context";
 
 type StoreItemProps = {
   store: MenuItem;
@@ -19,11 +20,24 @@ type StoreItemProps = {
 const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
   const router = useRouter();
   const { addItem } = useCart();
+  const { showAlert } = useAlert();
   const { user } = useAuth();
   const { mutate: addToFavorite, isPending } = useAddToFavorite();
   const [isDealPicErr, setDealPicErr] = useState(false);
 
   const onRestaurantClick = () => {
+    if (!user) {
+      showAlert({
+        title: "Heads Up!",
+        description:
+          "To access and proceed with your quotations, please sign in. It only takes a moment!",
+        confirmText: "Sign In Now",
+        onConfirm: () => router.push(`/auth/signin`),
+        cancelText: "Cancel",
+      });
+      return;
+    }
+    router.push(`/menu/?id=${store?.productId}`);
     // Handle click on the entire card if needed
   };
 
@@ -77,7 +91,6 @@ const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
       router.push("/menu");
     }
   };
-
   return (
     <Card
       className="group relative overflow-hidden rounded-2xl cursor-pointer shadow-md border-1 flex flex-col h-full py-2" // Use flex-col for stacking
@@ -121,19 +134,22 @@ const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
       </div>
 
       {/* --- Details Section (below the image) --- */}
-      <div className="relative flex-1 px-3 flex flex-col justify-between space-y-3">
+      <div className="relative flex-1 px-3 flex flex-col justify-between space-y-1">
         {" "}
         {/* flex-1 allows it to grow */}
         {/* Product Name & Favorite Icon */}
         <div className="flex items-start justify-between">
-          <p className="text-xl truncate pr-2">
+          <p className="text-lg truncate pr-2">
             {" "}
             {/* Added pr-2 to prevent overlap */}
             {store.productname} - {store?.unitname}
           </p>
           {/* Heart Icon moved here, relative to this div */}
         </div>
-        <MenuItemPricing item={store} />
+        <div className="flex gap-1 items-center">
+          <MenuItemPricing item={store} />
+          <span className="text-lg font-semibold">{store?.currencycode}</span>
+        </div>
         <Button
           onClick={onAddItem}
           className="text-bold text-base text-primary-foreground"

@@ -23,7 +23,7 @@ export function NavAdmin({
   // const { isMobile } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup className="">
       <SidebarGroupLabel>Store | Restaurant</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (

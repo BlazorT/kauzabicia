@@ -7,11 +7,11 @@ import { Label } from "../ui/label";
 export const SORT_OPTIONS: SortBy[] = [
   {
     id: 1,
-    name: "Top rated",
+    name: "Heighest To Lowest",
   },
   {
     id: 2,
-    name: "Distance",
+    name: "Lowest To Heighest",
   },
 ];
 
@@ -24,7 +24,7 @@ const SortFilters = () => {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">Sort By</p>
+      <p className="text-sm text-muted-foreground">Sort By (price)</p>
       <RadioGroup
         onValueChange={handleToggle}
         value={filters?.sortBy?.toString()}

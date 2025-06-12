@@ -1,6 +1,6 @@
 // src/components/menu/MenuItem/index.tsx
 import { MenuItem as MenuItemType } from "@/utils/types";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dialog } from "../ui/dialog";
 import { MenuItemControls } from "./menu-item-controlls";
 import { MenuItemDescription } from "./menu-item-description";
@@ -13,19 +13,24 @@ import { useCart } from "@/context/cart-context";
 import { getOptions } from "@/utils/menuUtils";
 import MenuItemFavorite from "./menu-item-fav";
 import { Card, CardContent } from "../ui/card";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface MenuItemProps {
   item: MenuItemType;
   mostlyBoughtTogetherItems: MenuItemType[];
   isStoreOpen: boolean;
+  showProductId: string | null;
 }
 
 export const MenuItem = ({
   item,
   mostlyBoughtTogetherItems,
   isStoreOpen = false,
+  showProductId,
 }: MenuItemProps) => {
-  const { addItem, increaseQuantity, findCartItem, items } = useCart();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { addItem, increaseQuantity, findCartItem } = useCart();
   const [isMenuItemDetailsOpen, setIsMenuItemDetailsOpen] =
     useState<boolean>(false);
 
@@ -42,10 +47,7 @@ export const MenuItem = ({
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
   const DOUBLE_CLICK_DELAY = 250; // ms
 
-  const isDeal = useMemo(() => items?.[0]?.isDeal, [items]);
-
   const handleClick = () => {
-    if (!isStoreOpen || isDeal) return;
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTime.current;
 
@@ -88,6 +90,18 @@ export const MenuItem = ({
   const toggleMenuItemDetails = () => {
     setIsMenuItemDetailsOpen(!isMenuItemDetailsOpen);
   };
+
+  useEffect(() => {
+    if (!showProductId) return;
+    if (item.productId === parseInt(showProductId)) {
+      toggleMenuItemDetails();
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("id");
+      const newQuery = params.toString();
+      router.replace(`?${newQuery}`, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item, showProductId]);
 
   // console.log({ item: item.menuJSON, id: item.productname });
   return (

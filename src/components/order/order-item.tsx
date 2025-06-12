@@ -1,4 +1,6 @@
+import { USER_ROLE } from "@/constants/constants";
 import { useAlert } from "@/context/alert-context";
+import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { useLOV } from "@/context/lov-context";
 import { useElapsedTime } from "@/hooks/useElapsedTime";
@@ -16,9 +18,8 @@ import { useMemo, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
-import OrderReview from "./order-review";
-import PayOrder from "./pay-order";
 import ManageOrder from "./manage-order";
+import OrderReview from "./order-review";
 
 type OrderItemProps = {
   order: ORDER;
@@ -28,6 +29,7 @@ type OrderItemProps = {
 const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   const router = useRouter();
   const { lovs } = useLOV();
+  const { user } = useAuth();
   const { showAlert, hideAlert } = useAlert();
   const { items, addItem, clearCart, totalPrice } = useCart();
   const { storeData } = useStoreInfo(order.storeid?.toString());
@@ -47,10 +49,10 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     [lovs?.statuses, order.status]
   );
 
-  const orderType = useMemo(
-    () => lovs?.ordertypes?.find((s) => s.id === order.saleTypeId)?.name,
-    [lovs?.ordertypes, order.saleTypeId]
-  );
+  // const orderType = useMemo(
+  //   () => lovs?.ordertypes?.find((s) => s.id === order.saleTypeId)?.name,
+  //   [lovs?.ordertypes, order.saleTypeId]
+  // );
 
   const order_products = useMemo(
     () => orderDetailRes?.data ?? [],
@@ -112,7 +114,13 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
             title: "Continue",
             onClick: () => {
               hideAlert();
-              router.push(`/dashboard/menu`);
+              let link = "";
+              if (user?.roleId === USER_ROLE.USER) {
+                link = "/menu";
+              } else {
+                link = "/dashboard/menu";
+              }
+              router.push(link);
             },
           },
         ],
@@ -163,7 +171,13 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     updatedItems.forEach((item: MenuItem) => {
       addItem(item);
     });
-    router.push(`/dashboard/menu`);
+    let link = "";
+    if (user?.roleId === USER_ROLE.USER) {
+      link = "/menu";
+    } else {
+      link = "/dashboard/menu";
+    }
+    router.push(link);
   };
   const onTrackOrder = () => {
     const track_url = `${API_URL}/dHJhY2tteW9yZGVy/${btoa(
@@ -173,7 +187,13 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   };
 
   const toOrderDetails = () => {
-    router.push(`/dashboard/orders/${btoa(order.saleid?.toString())}`);
+    let link = "";
+    if (user?.roleId === USER_ROLE.USER) {
+      link = `/orders/${btoa(order.saleid?.toString())}`;
+    } else {
+      link = `/dashboard/orders/${btoa(order.saleid?.toString())}`;
+    }
+    router.push(link);
   };
   // console.log({ order });
 
@@ -218,8 +238,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
 
             {/* Status and Time */}
             <p className="text-sm text-muted-foreground">
-              {orderType}, {orderStatus === "Active" ? "Placed" : orderStatus}{" "}
-              on{" "}
+              {orderStatus === "Active" ? "Placed" : orderStatus} on{" "}
               {moment
                 .utc(order.updatedat)
                 .local()
@@ -270,10 +289,10 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
         </div>
         <div className="w-auto flex justify-end items-center gap-2 flex-wrap mt-1 md:mt-0">
           <ManageOrder order_products={order_products} order={order} />
-          {order.paymentStatusId === 0 &&
+          {/* {order.paymentStatusId === 0 &&
             order.payableamount - order.paidamount > 0 && (
               <PayOrder order={order} />
-            )}
+            )} */}
           {isActiveOrder && (
             <Button
               onClick={onTrackOrder}

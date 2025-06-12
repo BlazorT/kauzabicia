@@ -125,7 +125,7 @@ const formSchema = z.object({
         preview: z.string(), // Base64 string for preview
       })
     )
-    .max(5, "You can upload a maximum of 5 images")
+    .max(20, "You can upload a maximum of 20 images")
     .refine(
       (files) =>
         files.every(
@@ -169,7 +169,7 @@ const ProductSettingForm = () => {
   const productDetailId = searchParams.get("id");
 
   const { data: menuResponse, isLoading: isPending } = useMenu(
-    productDetailId ? "1" : "",
+    "1",
     moment().format("YYYY-MM-DDTHH:mm:ss"),
     productDetailId ?? ""
   );
@@ -186,6 +186,7 @@ const ProductSettingForm = () => {
   const { user } = useAuth();
 
   const products = (data?.data ?? []) as AllMenuProduct[] | [];
+  // console.log(products);
   const units = (unitsData?.data ?? []) as ProductUnit[] | [];
 
   const [imagePreviews, setImagePreviews] = useState<
@@ -281,7 +282,10 @@ const ProductSettingForm = () => {
     });
 
     Promise.all(imagePromises).then(() => {
-      const updatedImages = [...imagePreviews, ...newImagePreviews].slice(0, 5); // Limit to 5 images
+      const updatedImages = [...imagePreviews, ...newImagePreviews].slice(
+        0,
+        20
+      ); // Limit to 5 images
       setImagePreviews(updatedImages);
       form.setValue(
         "images",
@@ -443,8 +447,7 @@ const ProductSettingForm = () => {
                               {field.value
                                 ? products.find(
                                     (product) =>
-                                      product.productId ===
-                                      parseInt(field.value)
+                                      product.id === parseInt(field.value)
                                   )?.name
                                 : "Select Product"}
                             </span>
@@ -462,15 +465,15 @@ const ProductSettingForm = () => {
                             <CommandEmpty>No products found.</CommandEmpty>
                             <CommandGroup>
                               {products
-                                .filter((product) => product?.productId !== 0)
+                                .filter((product) => product?.id !== 0)
                                 .map((product) => (
                                   <CommandItem
                                     value={product.name}
-                                    key={product.productId}
+                                    key={product.id}
                                     onSelect={() => {
                                       form.setValue(
                                         "productId",
-                                        product.productId?.toString()
+                                        product.id?.toString()
                                       );
                                     }}
                                   >
@@ -478,8 +481,7 @@ const ProductSettingForm = () => {
                                     <Check
                                       className={cn(
                                         "ml-auto",
-                                        product.productId ===
-                                          parseInt(field.value)
+                                        product.id === parseInt(field.value)
                                           ? "opacity-100"
                                           : "opacity-0"
                                       )}
@@ -821,7 +823,7 @@ const ProductSettingForm = () => {
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center gap-2"
-                disabled={imagePreviews.length >= 5 || isPendingImageUpload}
+                disabled={imagePreviews.length >= 20 || isPendingImageUpload}
               >
                 <Upload className="h-4 w-4" /> Upload Images
               </Button>

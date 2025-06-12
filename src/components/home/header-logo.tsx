@@ -5,8 +5,7 @@ const HeaderLogo = () => {
   return (
     <Link href={"/"}>
       <div className="flex gap-2 items-center">
-        <Image src={"/logo.jpeg"} alt="logo" width={60} height={60} />
-        <p className="text-lg font-bold">Kalida</p>
+        <Image src={"/logo.jpeg"} alt="logo" width={80} height={80} />
       </div>
     </Link>
   );

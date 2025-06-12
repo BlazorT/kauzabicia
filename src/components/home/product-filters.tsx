@@ -8,7 +8,7 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 export type AllMenuProduct = {
-  id: string;
+  id: number;
   productId: number;
   name: string;
   productname: string;

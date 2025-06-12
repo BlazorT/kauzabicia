@@ -11,6 +11,7 @@ import { useMenu } from "@/hooks/useMenu";
 import { API_URL } from "@/services/apiClient";
 import { MenuItem } from "@/utils/types";
 import moment from "moment";
+import { cleanPath } from "@/utils/menuUtils";
 
 const columns: ColumnDef<MenuItem>[] = [
   {
@@ -32,7 +33,7 @@ const columns: ColumnDef<MenuItem>[] = [
           {API_URL && (
             <Avatar className="size-8">
               <AvatarImage
-                src={API_URL + row.getValue("producturl")}
+                src={cleanPath(row.getValue("producturl"))}
                 alt={row.getValue("productname")}
               />
               <AvatarFallback>{initials}</AvatarFallback>

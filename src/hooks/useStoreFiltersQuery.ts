@@ -84,7 +84,10 @@ export const useStoreFiltersQuery = (searchQuery: string) => {
   ) as MenuItem[];
 
   const filteredStores = useMemo(() => {
-    // const sortId = filters.sortBy;
+    const sortId = filters.sortBy;
+    const categoryId = filters.storeTypeId;
+    const maxPrice = filters.priceRange.max;
+    const minPrice = filters.priceRange.min;
     // const offerId = filters.offerId;
     // const hasLocation =
     //   filters.lat && filters.lng && ipInfo?.geoplugin_countryCode;
@@ -106,39 +109,45 @@ export const useStoreFiltersQuery = (searchQuery: string) => {
       );
     }
 
+    if (minPrice != null && maxPrice != null) {
+      result = result.filter(
+        (product) =>
+          (product.unitprice ?? 0) >= minPrice &&
+          (product.unitprice ?? 0) <= maxPrice
+      );
+    }
+
     // Step 2: Filter by offer (e.g., has dealId)
     // if (offerId === 1) {
     //   result = result.filter((store) => store.dealId); // Only keep stores with dealId
     // }
 
+    if (categoryId && categoryId.length > 0) {
+      result = result.filter((product) =>
+        Array.isArray(categoryId)
+          ? categoryId.includes(product.categoryid)
+          : product.categoryid === categoryId
+      );
+    }
+
     // // Step 3: Sort
-    // if (sortId === 1) {
-    //   result = result.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    // } else if (sortId === 2 && hasLocation) {
-    //   result = result.slice().sort((a, b) => {
-    //     const distA = haversineDistance(
-    //       extractLatLong(a.gpslocation),
-    //       userCoords,
-    //       countryCode
-    //     );
-    //     const distB = haversineDistance(
-    //       extractLatLong(b.gpslocation),
-    //       userCoords,
-    //       countryCode
-    //     );
-    //     return distA - distB;
-    //   });
-    // }
+    if (sortId === 1) {
+      result = result
+        .slice()
+        .sort((a, b) => (b.unitprice ?? 0) - (a.unitprice ?? 0));
+    } else if (sortId === 2) {
+      result = result
+        .slice()
+        .sort((a, b) => (a.unitprice ?? 0) - (b.unitprice ?? 0));
+    }
 
     return result;
   }, [
     searchQuery,
     storeData,
-    // filters.sortBy,
-    // filters.offerId, // Make sure this is included as a dependency
-    // filters.lat,
-    // filters.lng,
-    // ipInfo,
+    filters.sortBy,
+    filters?.storeTypeId,
+    filters.priceRange,
   ]);
 
   return {

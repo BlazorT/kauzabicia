@@ -21,7 +21,7 @@ import {
   MenuItem as MenuItemType,
 } from "@/utils/types";
 import moment from "moment";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { RefObject, useEffect, useMemo, useState } from "react";
 
 export default function StorePage() {
@@ -47,7 +47,10 @@ export default function StorePage() {
   const { storeData } = useStoreInfo(storeId);
   const { addItem } = useCart();
   const { setOrderInfo } = useOrder();
+  const searchParams = useSearchParams();
   const isStoreOpen = storeData?.isStoreOpen ?? false;
+
+  const showProductId = searchParams.get("id");
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -412,6 +415,7 @@ export default function StorePage() {
                       item={item as MenuItemType}
                       mostlyBoughtTogetherItems={mostlyBoughtTogetherItems}
                       isStoreOpen={isStoreOpen}
+                      showProductId={showProductId}
                     />
                   )
                 )}

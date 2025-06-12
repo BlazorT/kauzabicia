@@ -20,32 +20,32 @@ const StoreTypeFilter = () => {
     updateFilter("storeTypeId", updated);
   };
 
-  const storeTypes = useMemo(() => lovs?.storetypes || [], [lovs]);
+  const categories = useMemo(() => lovs?.categories || [], [lovs]);
 
-  const visibleStoreTypes = showAll ? storeTypes : storeTypes.slice(0, 4);
+  const visibleStoreTypes = showAll ? categories : categories.slice(0, 4);
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">Restaurant Types</p>
+      <p className="text-sm text-muted-foreground">Categories</p>
       <div className="grid grid-cols-2 md:grid-cols-1 space-y-4">
-        {visibleStoreTypes.map((storeType) => (
-          <div key={storeType.id} className="flex items-center gap-3">
+        {visibleStoreTypes.map((categorie) => (
+          <div key={categorie.id} className="flex items-center gap-3">
             <Checkbox
-              id={storeType.id?.toString()}
-              checked={filters.storeTypeId?.includes(storeType.id)}
-              onCheckedChange={() => handleToggle(storeType.id)}
+              id={categorie.id?.toString()}
+              checked={filters.storeTypeId?.includes(categorie.id)}
+              onCheckedChange={() => handleToggle(categorie.id)}
             />
             <Label
-              htmlFor={storeType.id?.toString()}
+              htmlFor={categorie.id?.toString()}
               className="text-xs font-normal"
             >
-              {storeType.name}
+              {categorie.name}
             </Label>
           </div>
         ))}
       </div>
 
-      {storeTypes.length > 4 && (
+      {categories.length > 4 && (
         <Button
           size="sm"
           variant="link"

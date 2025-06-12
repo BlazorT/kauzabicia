@@ -1,32 +1,12 @@
-import { getImageUrlsFromVariation } from "@/utils/menuUtils";
 import { MenuItem } from "@/utils/types";
-import Autoplay from "embla-carousel-autoplay";
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import Lightbox from "yet-another-react-lightbox";
-import Captions from "yet-another-react-lightbox/plugins/captions";
-import "yet-another-react-lightbox/plugins/captions.css";
-import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
-import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import "yet-another-react-lightbox/plugins/thumbnails.css";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import "yet-another-react-lightbox/styles.css";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from "../ui/carousel";
 import { DialogContent, DialogTitle } from "../ui/dialog";
 import MenuItemVariations from "./meni-item-vairations";
 import MenuDetailControls from "./menu-detail-controls";
 import MenuItemOptions from "./menu-item-options";
 import { MenuItemPricing } from "./menu-item-pricing";
-import { MenuItemTags } from "./menu-item-tags";
 import MostBoughtTogether from "./menu-most-bought";
-
-// Add custom styles for lightbox
+import ImageCarousel from "../image-carousel";
 
 interface MenuItemDetailProps {
   item: MenuItem;
@@ -45,11 +25,6 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
     undefined
   );
   const [selectedVariation, setSelectedVariation] = useState<MenuItem>();
-  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     setSelectedVariation(
@@ -57,121 +32,30 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
         ? item.variations[0]
         : item
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!carouselApi) return;
-
-    const updateCarouselState = () => {
-      setCurrentIndex(carouselApi.selectedScrollSnap());
-    };
-
-    updateCarouselState();
-
-    carouselApi.on("select", updateCarouselState);
-
-    return () => {
-      carouselApi.off("select", updateCarouselState); // Clean up on unmount
-    };
-  }, [carouselApi]);
-
-  useEffect(() => {
-    setImageUrls(getImageUrlsFromVariation(selectedVariation));
-  }, [selectedVariation]);
-
-  const scrollToIndex = (index: number) => {
-    carouselApi?.scrollTo(index);
-  };
-
-  const dimensions = 54;
+  }, [item]);
 
   if (!selectedVariation) return null;
-  return (
-    <>
-      <DialogContent
-        aria-describedby="menu-detail"
-        aria-description="menu-detial"
-        title="menu-detail"
-        className="max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[50%] xl:max-w-[40%] p-0 max-h-[90vh] gap-1 overflow-y-auto"
-      >
-        <DialogTitle className="hidden"></DialogTitle>
-        <Carousel
-          plugins={[
-            Autoplay({
-              delay: 2000,
-            }),
-          ]}
-          setApi={setCarouselApi}
-          className="w-full h-60 justify-center items-center"
-        >
-          <CarouselContent>
-            {imageUrls.map((image, index) => (
-              <CarouselItem key={index}>
-                <div
-                  className="cursor-pointer"
-                  onClick={() => {
-                    setLightboxIndex(index);
-                    setIsLightboxOpen(true);
-                  }}
-                >
-                  <Image
-                    src={image}
-                    alt={selectedVariation.productname}
-                    sizes="100vw"
-                    width={dimensions}
-                    height={dimensions}
-                    className="object-contain w-full h-60"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <MenuItemTags
-                      isSpecial={selectedVariation.isSpecial === 1}
-                      size="md"
-                    />
-                    {item.isHalal === 1 && (
-                      <span
-                        className={`absolute left-0  inline-flex items-center justify-center rounded-full bg-red-600`}
-                        style={{ width: dimensions, height: dimensions }}
-                      >
-                        <Image
-                          src="/halal.png"
-                          alt="Halal"
-                          width={dimensions}
-                          height={dimensions}
-                          style={{
-                            filter: "invert(1)",
-                          }}
-                        />
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {imageUrls?.length > 1 && (
-            <div className="absolute bottom-[-12px] left-0 right-0 flex justify-center space-x-2 z-20">
-              {imageUrls.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => scrollToIndex(index)}
-                  className={`w-3 h-3 rounded-full ${
-                    currentIndex === index
-                      ? "bg-primary"
-                      : "bg-muted-foreground"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </Carousel>
 
-        <div className="px-4 space-y-2 py-1">
+  return (
+    <DialogContent
+      aria-describedby="menu-detail"
+      aria-description="menu-detial"
+      title="menu-detail"
+      className="max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[70%] p-0 max-h-[90vh] gap-1 overflow-y-auto"
+    >
+      <DialogTitle className="hidden"></DialogTitle>
+      <div className="flex flex-col md:flex-row gap-4 p-4">
+        {/* Left side - Image Carousel */}
+        <div className="w-full md:w-1/2">
+          <ImageCarousel item={selectedVariation} />
+        </div>
+
+        {/* Right side - Details */}
+        <div className="w-full md:w-1/2 space-y-4">
           <div className="flex flex-row space-x-1 flex-wrap max-w-[90%]">
-            <p className="text-lg font-bold ]">
+            <p className="text-lg font-bold">
               {selectedVariation.productname} - {selectedVariation.unitname}
             </p>
-            {/* <p className="text-foreground">{selectedVariation.unitname}</p> */}
             <span className="text-lg font-bold">| Price : </span>
             <MenuItemPricing
               className="flex items-center gap-2"
@@ -199,27 +83,14 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
               isStoreOpen={isStoreOpen}
             />
           )}
+          <MenuDetailControls
+            selectedVariation={selectedVariation}
+            selectedOption={selectedOption}
+            toggleMenuItemDetails={toggleMenuItemDetails}
+          />
         </div>
-        <MenuDetailControls
-          selectedVariation={selectedVariation}
-          selectedOption={selectedOption}
-          toggleMenuItemDetails={toggleMenuItemDetails}
-        />
-      </DialogContent>
-      <Lightbox
-        className="z-[9999999999]"
-        open={isLightboxOpen}
-        styles={{ container: { zIndex: 99999999 } }}
-        close={() => setIsLightboxOpen(false)}
-        index={lightboxIndex}
-        slides={imageUrls.map((img) => ({
-          src: img,
-          title: selectedVariation.productname,
-          description: selectedVariation.description,
-        }))}
-        plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
-      />
-    </>
+      </div>
+    </DialogContent>
   );
 };
 

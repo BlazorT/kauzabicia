@@ -16,7 +16,7 @@ interface HomeStoresProps {
 
 const HomeStores: React.FC<HomeStoresProps> = ({
   toggleFilterSheet,
-  toggleIsMapVisble,
+  // toggleIsMapVisble,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const {
@@ -47,27 +47,23 @@ const HomeStores: React.FC<HomeStoresProps> = ({
   //     </div>
   //   );
 
-  if (
-    storeData.length === 0 ||
-    (storeData.length > 0 && filteredStores.length === 0)
-  ) {
+  if (storeData.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[80vh] w-full">
         <div className="p-6 text-center flex flex-col items-center text-base text-muted-foreground border border-dashed rounded-xl space-y-4 shadow-md ">
           <SearchX size={80} className="text-red-400" />
           <p className="text-2xl font-semibold">Sorry</p>
           <p className="text-lg text-gray-500 max-w-sm">
-            No restaurants match the selected criteria
+            No products match the selected criteria
           </p>
           <Button
             size="lg"
             variant="outline"
             onClick={() => {
               clearAllFilters();
-              toggleIsMapVisble();
             }}
           >
-            Clear Filters & Change Location
+            Clear Filters
           </Button>
         </div>
       </div>
@@ -77,10 +73,7 @@ const HomeStores: React.FC<HomeStoresProps> = ({
   return (
     <div className="w-full space-y-4 px-2 md:px-0">
       <div className="flex items-center justify-between">
-        <SearchBar
-          onSearch={setSearchQuery}
-          placeholder="Search Restaurants..."
-        />
+        <SearchBar onSearch={setSearchQuery} placeholder="Search Products..." />
         <button
           onClick={toggleFilterSheet}
           className="ml-2 lg:hidden block relative"

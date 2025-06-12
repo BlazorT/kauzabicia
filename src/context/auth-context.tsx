@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(userData);
     Cookies.set("user", JSON.stringify(userData), { expires: 7 });
     if (items?.length > 0) {
-      router.push("/checkout");
+      router.push("/menu");
     } else {
       router.push("/");
     }

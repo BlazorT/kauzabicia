@@ -1,7 +1,7 @@
 // src/components/menu/MenuItem/components/MenuItemImage.tsx
+import { cleanPath } from "@/utils/menuUtils";
 import Image from "next/image";
 import { useState } from "react";
-import { API_URL } from "@/services/apiClient";
 
 interface MenuItemImageProps {
   productUrl?: string;
@@ -23,7 +23,9 @@ export const MenuItemImage = ({
   return (
     <div className="relative w-[6rem] h-[6rem] flex-shrink-0">
       <Image
-        src={productUrl && !imageError ? API_URL + productUrl : "/no-image.png"}
+        src={
+          productUrl && !imageError ? cleanPath(productUrl) : "/no-image.png"
+        }
         alt={productName}
         fill
         sizes="(max-width: 768px) 96px, 96px"

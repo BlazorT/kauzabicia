@@ -8,7 +8,7 @@ import ManagedOrder from "./managed-order";
 import OrderCustomer from "./order-customer";
 import PlaceOrder from "./place-order";
 import ServiceCharges from "./service-charges";
-import OrderState from "./order-state";
+
 const CheckoutInfo = () => {
   const guestsCollapsibleRef = useRef<COLLAPSIBLE_REF>(null);
   const customerCollapsibleRef = useRef<COLLAPSIBLE_REF>(null);
@@ -26,7 +26,6 @@ const CheckoutInfo = () => {
         {isValidOrderEdit && <ManagedOrder saleId={atob(saleId)} />}
         <ErrorSnackbar />
         <DeliveryAddress />
-        <OrderState />
         {/* <DeliveryOptions /> */}
         {/* <OrderGuests guestsCollapsibleRef={guestsCollapsibleRef} /> */}
         <OrderCustomer customerCollapsibleRef={customerCollapsibleRef} />

@@ -244,3 +244,8 @@ export const getImageUrlsFromVariation = (
 
   return [producturl ? API_URL + producturl : fallbackImage];
 };
+// helpers/pathUtils.ts
+export const cleanPath = (productUrl?: string): string => {
+  if (!API_URL || !productUrl) return "";
+  return API_URL + productUrl.replace(/^wwwroot[\\/]+/, "").replace(/\\/g, "/");
+};

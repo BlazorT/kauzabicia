@@ -16,7 +16,6 @@ import { Separator } from "../ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import CartItem from "./cart-item";
 import CartSummary from "./cart-summary";
-import CartTabs from "./cart-tabs";
 
 export default function CartSidebar({ saleId }: { saleId: string | null }) {
   const {
@@ -106,7 +105,7 @@ export default function CartSidebar({ saleId }: { saleId: string | null }) {
           <div className="flex flex-col h-full">
             {/* Scrollable content area with padding at bottom */}
             <div className="flex-1 overflow-y-auto pb-24">
-              {!saleId && <CartTabs />}
+              {/* {!saleId && <CartTabs />} */}
               <div className="p-4 space-y-4">
                 {items.length === 0 ? (
                   <p className="text-gray-600">Your cart is empty.</p>
@@ -185,7 +184,7 @@ export default function CartSidebar({ saleId }: { saleId: string | null }) {
             <>
               {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto space-y-2">
-                {!saleId && <CartTabs />}
+                {/* {!saleId && <CartTabs />} */}
                 <div>
                   {items.map((item, index) => (
                     <div key={item.productDetailId}>

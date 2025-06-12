@@ -2,10 +2,8 @@
 
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
 import PriceFilters from "./price-filter";
-import ProductFilters from "./product-filters";
 import SortFilters from "./sort-filters";
 import StoreTypeFilter from "./store-type-filter";
-import OfferFilter from "./offer-filters";
 
 const HomeFilters = () => {
   const { clearAllFilters, filterCount } = useRestaurantFilters();
@@ -23,8 +21,8 @@ const HomeFilters = () => {
         )}
       </div>
       <SortFilters />
-      <OfferFilter />
-      <ProductFilters />
+      {/* <OfferFilter /> */}
+      {/* <ProductFilters /> */}
       <StoreTypeFilter />
       <PriceFilters />
     </div>

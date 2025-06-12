@@ -10,6 +10,8 @@ import {
   ScrollText,
   MapPin,
   Table,
+  MessageCircleMore,
+  ChartColumnStacked,
 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import moment from "moment";
@@ -24,6 +26,8 @@ export type CustomerInfo = {
   name?: string;
   email?: string;
   contact?: string;
+  whatsapp?: string;
+  state?: string;
 };
 
 export type BookingInfo = {
@@ -158,6 +162,20 @@ const OrderDetails: React.FC<OrderDetailProps> = ({ order }) => {
               icon={Phone}
               label="Contact:"
               value={parseCustomerInfo.contact}
+            />
+          )}
+          {parseCustomerInfo?.whatsapp && (
+            <InfoItem
+              icon={MessageCircleMore}
+              label="WhatsApp:"
+              value={parseCustomerInfo.whatsapp}
+            />
+          )}
+          {parseCustomerInfo?.state && (
+            <InfoItem
+              icon={ChartColumnStacked}
+              label="State:"
+              value={parseCustomerInfo.state}
             />
           )}
           {groupedBookings && Object.keys(groupedBookings).length > 0 && (

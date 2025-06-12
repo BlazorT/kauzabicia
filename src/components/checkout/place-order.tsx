@@ -6,7 +6,6 @@ import { useLocation } from "@/context/location-context";
 import { useOrder } from "@/context/order-context";
 import { useDistanceAndAddressInfo } from "@/hooks/useDistanceAndAddressInfo";
 import { useFetchOrderDetails, usePlaceOrder } from "@/hooks/useOrder";
-import { useSocket } from "@/hooks/useSocket";
 import { getOrCreateSessionId, isEmail } from "@/lib/utils";
 import {
   calculateEachProductTax,
@@ -15,17 +14,12 @@ import {
   getTaxAmount,
   getTotalOrderAmount,
 } from "@/utils/cartUtils";
-import {
-  COLLAPSIBLE_REF,
-  JazzCashIPNData,
-  ORDER_RESPONSE,
-  OrderProduct,
-} from "@/utils/types";
+import { COLLAPSIBLE_REF, ORDER_RESPONSE, OrderProduct } from "@/utils/types";
 import Lottie from "lottie-react";
 import { Loader2 } from "lucide-react";
 import moment from "moment";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { RefObject, useEffect, useMemo, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { RefObject, useMemo } from "react";
 import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
 
@@ -62,7 +56,7 @@ export default function PlaceOrder({
   const { selectedPosition, ipInfo } = useLocation();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
   const { storeData } = useStoreInfo(items[0]?.storeId?.toString() ?? "");
 
@@ -88,11 +82,11 @@ export default function PlaceOrder({
   //   loadingJC,
   // } = useJazzCash();
 
-  const socketRef = useSocket();
+  // const socketRef = useSocket();
 
   const { mutate: placeCompactOrder, isPending } = usePlaceOrder();
 
-  const jazzCashRef = useRef<{ close: () => void }>(null);
+  // const jazzCashRef = useRef<{ close: () => void }>(null);
 
   const currencyCode =
     lovs?.currencies?.find((c) => c.id === storeData?.store?.currencyId)
@@ -334,12 +328,20 @@ export default function PlaceOrder({
       orderInfo.orderType === 1 ? parseInt(orderInfo?.guests ?? "0") : 0;
 
     const customerInfo =
-      !orderInfo.name && !orderInfo.phone && !orderInfo.email
+      !orderInfo.name &&
+      !orderInfo.phone &&
+      !orderInfo.email &&
+      !orderInfo.stateId &&
+      !orderInfo.whatsApp
         ? ""
         : JSON.stringify({
             name: orderInfo?.name,
             contact: orderInfo.phone,
             email: orderInfo.email,
+            state:
+              lovs?.states?.find((state) => state.id === orderInfo?.stateId)
+                ?.name ?? "",
+            whatsapp: orderInfo?.whatsApp,
           });
 
     const gpsLocation =
@@ -352,15 +354,12 @@ export default function PlaceOrder({
           })
         : "";
 
-    const serviceCharges =
-      orderInfo.orderType === 1
-        ? parseFloat(getTaxAmount(totalPrice, config?.serviceCharges ?? 0))
-        : 0;
+    const serviceCharges = parseFloat(
+      getTaxAmount(totalPrice, config?.serviceCharges ?? 0)
+    );
 
-    const deliveryCharges =
-      orderInfo?.deliveryCharges !== 0 && orderInfo.orderType === 3
-        ? orderInfo.deliveryCharges
-        : 0;
+    const deliveryCharges = orderInfo.deliveryCharges;
+
     let saleDetails = [];
     if (!saleId) {
       saleDetails = items.map((item) => ({
@@ -527,7 +526,7 @@ export default function PlaceOrder({
       taxAmount: parseFloat(getTaxAmount(totalPrice, config?.tax ?? 0)),
       saleTypeId: orderInfo.orderType ?? 1,
       orderNote: config?.enableOrderNotes ? orderInfo.orderNote ?? "" : "",
-      address: orderInfo.orderType === 3 ? orderInfo.address : "",
+      address: orderInfo.address ?? "",
       deliveryOptionId:
         orderInfo.orderType === 3 ? orderInfo.deliveryOption : 0,
       tipAmount,
@@ -538,37 +537,37 @@ export default function PlaceOrder({
       fmctoken: "",
       tableBookings: mergedTableBookings,
     };
-    // console.log({ orderBody });
+    console.log({ orderBody });
     // console.log(JSON.stringify(orderBody));
     // return;
     placeCompactOrder(
       { orderBody },
       {
         onSuccess: (response) => {
-          // console.log(response);
+          console.log(response);
           if (response && response.status === true) {
             const orderResponse = response.data as ORDER_RESPONSE;
 
-            if (socketRef && user) {
-              const message = {
-                userId: user?.id,
-                storeId: items[0]?.storeId,
-                attachments: JSON.stringify([items[0]?.producturl]),
-                payable: `${
-                  items[0]?.dealCode
-                    ? items[0]?.schemeAmount?.toFixed(2)
-                    : parseFloat(
-                        getPayableAmount(totalPrice, config, orderInfo)
-                      )
-                }`,
-                token: orderResponse?.salesinvoicecode,
-                trackingId: orderResponse?.saleid?.toString(),
-                items: items,
-                orderNote: orderInfo?.orderNote ?? "",
-              };
-              console.log("emit");
-              socketRef?.current?.emit("orderMessage", message);
-            }
+            // if (socketRef && user) {
+            //   const message = {
+            //     userId: user?.id,
+            //     storeId: items[0]?.storeId,
+            //     attachments: JSON.stringify([items[0]?.producturl]),
+            //     payable: `${
+            //       items[0]?.dealCode
+            //         ? items[0]?.schemeAmount?.toFixed(2)
+            //         : parseFloat(
+            //             getPayableAmount(totalPrice, config, orderInfo)
+            //           )
+            //     }`,
+            //     token: orderResponse?.salesinvoicecode,
+            //     trackingId: orderResponse?.saleid?.toString(),
+            //     items: items,
+            //     orderNote: orderInfo?.orderNote ?? "",
+            //   };
+            //   console.log("emit");
+            //   socketRef?.current?.emit("orderMessage", message);
+            // }
             showAlert({
               className: "text-center",
               title: `Order ${isValidOrderEdit ? "Edited" : "Placed"}`,
@@ -599,7 +598,7 @@ export default function PlaceOrder({
               }, 1000);
             } else {
               setTimeout(() => {
-                router.replace(`/${btoa(items[0].storeId.toString())}`);
+                router.replace(`/menu`);
               }, 4000);
 
               setTimeout(() => {
@@ -633,121 +632,121 @@ export default function PlaceOrder({
     );
   };
 
-  useEffect(() => {
-    if (!socketRef.current) return;
-    const handleJCPayment = (ipnData: JazzCashIPNData) => {
-      // console.log({ ipnData });
-      jazzCashRef.current?.close();
-      if (ipnData.ipnData.pp_TxnRefNo === orderInfo.jazzCashTxnRef) {
-        if (ipnData.status) {
-          const filteredResponse = {
-            pp_TxnType: ipnData?.ipnData?.pp_TxnType || "",
-            pp_Amount: ipnData?.ipnData?.pp_Amount || "",
-            pp_BillReference: ipnData?.ipnData?.pp_BillReference || "",
-            pp_ResponseCode: ipnData?.ipnData?.pp_ResponseCode || "",
-            pp_RetreivalReferenceNo:
-              ipnData?.ipnData?.pp_RetreivalReferenceNo || "",
-            pp_SubMerchantID: ipnData?.ipnData?.pp_SubMerchantID || "",
-            pp_TxnCurrency: ipnData?.ipnData?.pp_TxnCurrency || "",
-            pp_TxnDateTime: ipnData?.ipnData?.pp_TxnDateTime || "",
-            pp_TxnRefNo: ipnData?.ipnData?.pp_TxnRefNo || "",
-            pp_MobileNumber: ipnData?.ipnData?.pp_MobileNumber || "",
-            pp_CNIC: ipnData?.ipnData?.pp_CNIC || "",
-            pp_SecureHash: ipnData?.ipnData?.pp_SecureHash || "",
-          };
-          placeOrder(btoa(JSON.stringify(filteredResponse)));
-        } else {
-          setError({
-            title: "Error",
-            message:
-              ipnData.ipnData.pp_ResponseMessage ??
-              "Payment failed. Please try again.",
-            variant: ErrorVariant.Error,
-          });
-        }
-      }
-    };
-    const socket = socketRef.current;
-    socket.on("jcipn", handleJCPayment);
+  // useEffect(() => {
+  //   if (!socketRef.current) return;
+  //   const handleJCPayment = (ipnData: JazzCashIPNData) => {
+  //     // console.log({ ipnData });
+  //     jazzCashRef.current?.close();
+  //     if (ipnData.ipnData.pp_TxnRefNo === orderInfo.jazzCashTxnRef) {
+  //       if (ipnData.status) {
+  //         const filteredResponse = {
+  //           pp_TxnType: ipnData?.ipnData?.pp_TxnType || "",
+  //           pp_Amount: ipnData?.ipnData?.pp_Amount || "",
+  //           pp_BillReference: ipnData?.ipnData?.pp_BillReference || "",
+  //           pp_ResponseCode: ipnData?.ipnData?.pp_ResponseCode || "",
+  //           pp_RetreivalReferenceNo:
+  //             ipnData?.ipnData?.pp_RetreivalReferenceNo || "",
+  //           pp_SubMerchantID: ipnData?.ipnData?.pp_SubMerchantID || "",
+  //           pp_TxnCurrency: ipnData?.ipnData?.pp_TxnCurrency || "",
+  //           pp_TxnDateTime: ipnData?.ipnData?.pp_TxnDateTime || "",
+  //           pp_TxnRefNo: ipnData?.ipnData?.pp_TxnRefNo || "",
+  //           pp_MobileNumber: ipnData?.ipnData?.pp_MobileNumber || "",
+  //           pp_CNIC: ipnData?.ipnData?.pp_CNIC || "",
+  //           pp_SecureHash: ipnData?.ipnData?.pp_SecureHash || "",
+  //         };
+  //         placeOrder(btoa(JSON.stringify(filteredResponse)));
+  //       } else {
+  //         setError({
+  //           title: "Error",
+  //           message:
+  //             ipnData.ipnData.pp_ResponseMessage ??
+  //             "Payment failed. Please try again.",
+  //           variant: ErrorVariant.Error,
+  //         });
+  //       }
+  //     }
+  //   };
+  //   const socket = socketRef.current;
+  //   socket.on("jcipn", handleJCPayment);
 
-    return () => {
-      socket.off("jcipn", handleJCPayment); // 🔥 Proper cleanup
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketRef, orderInfo.jazzCashTxnRef, jazzCashRef]);
+  //   return () => {
+  //     socket.off("jcipn", handleJCPayment); // 🔥 Proper cleanup
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [socketRef, orderInfo.jazzCashTxnRef, jazzCashRef]);
 
-  useEffect(() => {
-    const amount = searchParams.get("amount");
-    const orderRefNumber = searchParams.get("orderRefNumber");
-    const message = searchParams.get("message");
-    const transactionRefNumber = searchParams.get("transactionRefNumber");
+  // useEffect(() => {
+  //   const amount = searchParams.get("amount");
+  //   const orderRefNumber = searchParams.get("orderRefNumber");
+  //   const message = searchParams.get("message");
+  //   const transactionRefNumber = searchParams.get("transactionRefNumber");
 
-    const pp_TxnType = searchParams.get("pp_TxnType") || "";
-    const pp_Amount = searchParams.get("pp_Amount") || "";
-    const pp_BillReference = searchParams.get("pp_BillReference") || "";
-    const pp_ResponseCode = searchParams.get("pp_ResponseCode") || "";
-    const pp_RetreivalReferenceNo =
-      searchParams.get("pp_RetreivalReferenceNo") || "";
-    const pp_SubMerchantID = searchParams.get("pp_SubMerchantID") || "";
-    const pp_TxnCurrency = searchParams.get("pp_TxnCurrency") || "";
-    const pp_TxnDateTime = searchParams.get("pp_TxnDateTime") || "";
-    const pp_TxnRefNo = searchParams.get("pp_TxnRefNo") || "";
-    const pp_MobileNumber = searchParams.get("pp_MobileNumber") || "";
-    const pp_CNIC = searchParams.get("pp_CNIC") || "";
-    const pp_SecureHash = searchParams.get("pp_SecureHash") || "";
-    const pp_ResponseMessage = searchParams.get("pp_ResponseMessage") || "";
+  //   const pp_TxnType = searchParams.get("pp_TxnType") || "";
+  //   const pp_Amount = searchParams.get("pp_Amount") || "";
+  //   const pp_BillReference = searchParams.get("pp_BillReference") || "";
+  //   const pp_ResponseCode = searchParams.get("pp_ResponseCode") || "";
+  //   const pp_RetreivalReferenceNo =
+  //     searchParams.get("pp_RetreivalReferenceNo") || "";
+  //   const pp_SubMerchantID = searchParams.get("pp_SubMerchantID") || "";
+  //   const pp_TxnCurrency = searchParams.get("pp_TxnCurrency") || "";
+  //   const pp_TxnDateTime = searchParams.get("pp_TxnDateTime") || "";
+  //   const pp_TxnRefNo = searchParams.get("pp_TxnRefNo") || "";
+  //   const pp_MobileNumber = searchParams.get("pp_MobileNumber") || "";
+  //   const pp_CNIC = searchParams.get("pp_CNIC") || "";
+  //   const pp_SecureHash = searchParams.get("pp_SecureHash") || "";
+  //   const pp_ResponseMessage = searchParams.get("pp_ResponseMessage") || "";
 
-    const filteredResponse = {
-      pp_TxnType,
-      pp_Amount,
-      pp_BillReference,
-      pp_ResponseCode,
-      pp_RetreivalReferenceNo,
-      pp_SubMerchantID,
-      pp_TxnCurrency,
-      pp_TxnDateTime,
-      pp_TxnRefNo,
-      pp_MobileNumber,
-      pp_CNIC,
-      pp_SecureHash,
-    };
-    // console.log({ pp_ResponseMessage });
-    setTimeout(() => {
-      if (pp_TxnRefNo && pp_TxnRefNo === orderInfo.jazzCashTxnRef) {
-        if (pp_ResponseCode === "000") {
-          placeOrder(btoa(JSON.stringify(filteredResponse)));
-        } else {
-          setError({
-            title: "Error",
-            message: pp_ResponseMessage ?? "Payment failed. Please try again.",
-            variant: ErrorVariant.Error,
-          });
-          window.history.replaceState({}, document.title, pathname);
-        }
-      }
-      if (amount || orderRefNumber || message) {
-        if (message) {
-          setError({
-            title: "EasyPaisa Payment Error",
-            message: message,
-            variant: ErrorVariant.Error,
-          });
-          window.history.replaceState({}, document.title, pathname);
-        } else {
-          const paymentData = {
-            orderRefNumber,
-            message,
-            amount,
-            transactionRefNumber,
-          };
-          placeOrder(btoa(JSON.stringify(paymentData)));
-        }
+  //   const filteredResponse = {
+  //     pp_TxnType,
+  //     pp_Amount,
+  //     pp_BillReference,
+  //     pp_ResponseCode,
+  //     pp_RetreivalReferenceNo,
+  //     pp_SubMerchantID,
+  //     pp_TxnCurrency,
+  //     pp_TxnDateTime,
+  //     pp_TxnRefNo,
+  //     pp_MobileNumber,
+  //     pp_CNIC,
+  //     pp_SecureHash,
+  //   };
+  //   // console.log({ pp_ResponseMessage });
+  //   setTimeout(() => {
+  //     if (pp_TxnRefNo && pp_TxnRefNo === orderInfo.jazzCashTxnRef) {
+  //       if (pp_ResponseCode === "000") {
+  //         placeOrder(btoa(JSON.stringify(filteredResponse)));
+  //       } else {
+  //         setError({
+  //           title: "Error",
+  //           message: pp_ResponseMessage ?? "Payment failed. Please try again.",
+  //           variant: ErrorVariant.Error,
+  //         });
+  //         window.history.replaceState({}, document.title, pathname);
+  //       }
+  //     }
+  //     if (amount || orderRefNumber || message) {
+  //       if (message) {
+  //         setError({
+  //           title: "EasyPaisa Payment Error",
+  //           message: message,
+  //           variant: ErrorVariant.Error,
+  //         });
+  //         window.history.replaceState({}, document.title, pathname);
+  //       } else {
+  //         const paymentData = {
+  //           orderRefNumber,
+  //           message,
+  //           amount,
+  //           transactionRefNumber,
+  //         };
+  //         placeOrder(btoa(JSON.stringify(paymentData)));
+  //       }
 
-        // Remove query params from URL
-      }
-    }, 1500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, pathname]);
+  //       // Remove query params from URL
+  //     }
+  //   }, 1500);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [searchParams, pathname]);
 
   // useEffect(() => {
   //   if (isPaymentSuccess) placeOrder();
@@ -786,7 +785,7 @@ export default function PlaceOrder({
             variant="outline"
             onClick={() =>
               router.replace(
-                `/${btoa(items[0].storeId.toString())}/${
+                `/menu/${
                   isValidOrderEdit ? `?saleId=${btoa(atob(saleId))}` : ""
                 }`
               )
