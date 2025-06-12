@@ -19,7 +19,7 @@ interface MenuItemProps {
   item: MenuItemType;
   mostlyBoughtTogetherItems: MenuItemType[];
   isStoreOpen: boolean;
-  showProductId: string | null;
+  showProductId?: string | null;
 }
 
 export const MenuItem = ({
