@@ -212,7 +212,7 @@ const ProductSettingForm = () => {
   });
 
   useEffect(() => {
-    if (!updating_product) return;
+    if (!productDetailId) return;
     form.setValue("productId", updating_product?.productId?.toString());
     form.setValue("unitId", updating_product?.unitId?.toString());
     form.setValue(
@@ -227,7 +227,7 @@ const ProductSettingForm = () => {
     form.setValue("readyTime", updating_product?.kitchenTimeInMins);
     form.setValue("description", updating_product?.description);
     form.setValue("code", updating_product?.barcode);
-  }, [updating_product, form]);
+  }, [updating_product, form, productDetailId]);
 
   const unitPrice = form.watch("unitPrice");
   // const discount = form.watch("discount");
