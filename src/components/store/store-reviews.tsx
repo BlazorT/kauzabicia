@@ -47,6 +47,9 @@ const StoreReview: React.FC<StoreReviewProps> = ({ review }) => {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isOverflowing, setIsOverflowing] = useState(false);
 
+  const [selectedImage, setSelectedImage] = useState(1);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
   const findProduct = (productId: number) =>
     menuData.find((item) => item.productDetailId === productId);
 
@@ -135,6 +138,10 @@ const StoreReview: React.FC<StoreReviewProps> = ({ review }) => {
             mostlyBoughtTogetherItems={mostlyBoughtTogetherItems}
             toggleMenuItemDetails={toggleMenuItemDetails}
             isStoreOpen={storeData?.isStoreOpen ?? false}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            isLightboxOpen={isLightboxOpen}
+            setIsLightboxOpen={setIsLightboxOpen}
           />
         </Dialog>
       )}

@@ -39,7 +39,7 @@ export const StoreRating = ({
   showReviews = false,
 }: StoreRatingProps) => {
   const { data: reviewsRes, isPending } = useGetStoreReviews(store?.id);
-
+  // console.log({ reviewsRes });
   const [isRatingDialogOpen, setIsDialogOpen] = useState(false);
   const [filter, setFilter] = useState(REVIEW_FILTERS[0]);
 
