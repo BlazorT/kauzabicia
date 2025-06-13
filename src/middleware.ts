@@ -57,7 +57,7 @@ export function middleware(request: NextRequest) {
   // }
 
   // 🚫 Public users can't access /dashboard
-  if (pathname === "/dashboard" && user?.roleId === USER_ROLE.USER) {
+  if (pathname.includes("/dashboard") && user?.roleId === USER_ROLE.USER) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
