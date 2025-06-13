@@ -10,10 +10,19 @@ import { MenuItemImage } from "./menu-item-image";
 import { MenuItemPricing } from "./menu-item-pricing";
 import { MenuItemTags } from "./menu-item-tags";
 import { useCart } from "@/context/cart-context";
-import { getOptions } from "@/utils/menuUtils";
+import { getImageUrlsFromVariation, getOptions } from "@/utils/menuUtils";
 import MenuItemFavorite from "./menu-item-fav";
 import { Card, CardContent } from "../ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
+import { createPortal } from "react-dom";
+import Lightbox from "yet-another-react-lightbox";
+import Captions from "yet-another-react-lightbox/plugins/captions";
+import "yet-another-react-lightbox/plugins/captions.css";
+import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
+import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -33,6 +42,11 @@ export const MenuItem = ({
   const { addItem, increaseQuantity, findCartItem } = useCart();
   const [isMenuItemDetailsOpen, setIsMenuItemDetailsOpen] =
     useState<boolean>(false);
+
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const imageUrls = getImageUrlsFromVariation(item);
 
   const hasVariations = useMemo(
     () => item?.variationCount && item?.variationCount > 1,
@@ -74,7 +88,7 @@ export const MenuItem = ({
       clearTimeout(clickTimeout.current);
       clickTimeout.current = null;
     }
-    console.log("double click");
+    // console.log("double click");
     if (hasOptions || hasVariations) {
       toggleMenuItemDetails();
       return;
@@ -159,8 +173,35 @@ export const MenuItem = ({
           mostlyBoughtTogetherItems={mostlyBoughtTogetherItems}
           toggleMenuItemDetails={toggleMenuItemDetails}
           isStoreOpen={isStoreOpen}
+          setIsLightboxOpen={setIsLightboxOpen}
+          setSelectedImage={setSelectedImage}
+          selectedImage={selectedImage}
+          isLightboxOpen={isLightboxOpen}
         />
       </Dialog>
+      {typeof window !== "undefined" &&
+        createPortal(
+          <Lightbox
+            open={isLightboxOpen}
+            close={() => setIsLightboxOpen(false)}
+            index={selectedImage}
+            slides={imageUrls.map((img) => ({
+              src: img,
+              title: item.productname,
+              description: item.description,
+            }))}
+            plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
+            styles={{ container: { zIndex: 99999999 } }}
+            carousel={{ finite: true }}
+            controller={{ closeOnBackdropClick: false }}
+            zoom={{
+              maxZoomPixelRatio: 4, // 🔍 Increase zoom level (default is 2)
+              zoomInMultiplier: 2, // Controls how fast it zooms in
+              doubleTapDelay: 300, // Optional: adjust responsiveness
+            }}
+          />,
+          document.body
+        )}
     </>
   );
 };

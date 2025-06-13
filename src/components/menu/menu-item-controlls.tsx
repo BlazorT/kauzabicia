@@ -195,7 +195,7 @@ export const MenuItemControls = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.15 }}
-                className="flex items-center gap-2 border-secondary border-2 p-1 rounded-full hover:shadow-sm hover:shadow-muted-foreground/10 bg-background"
+                className="flex items-center gap-2 border-muted-foreground border-2 p-1 rounded-full hover:shadow-sm hover:shadow-muted-foreground/10 bg-background"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}

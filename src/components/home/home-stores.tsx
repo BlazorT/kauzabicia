@@ -89,7 +89,7 @@ const HomeStores: React.FC<HomeStoresProps> = ({
   }
 
   return (
-    <div className="w-full space-y-4 px-2 md:px-0">
+    <div className="w-full space-y-2 px-2 md:px-0">
       <div className="flex items-center justify-between">
         <button
           onClick={toggleFilterSheet}
@@ -103,21 +103,19 @@ const HomeStores: React.FC<HomeStoresProps> = ({
           )}
         </button>
       </div>
-      <div className="sticky top-0 z-50">
-        {filteredMenu.length > 1 && (
-          <CategoryNav
-            categories={filteredMenu}
-            activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-            scrollToCategory={scrollToCategory}
-            canScrollLeft={canScrollLeft}
-            canScrollRight={canScrollRight}
-            scrollLeft={scrollLeft}
-            scrollRight={scrollRight}
-            scrollRef={scrollRef as RefObject<HTMLDivElement>}
-          />
-        )}
-      </div>
+      {filteredMenu.length > 1 && (
+        <CategoryNav
+          categories={filteredMenu}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          scrollToCategory={scrollToCategory}
+          canScrollLeft={canScrollLeft}
+          canScrollRight={canScrollRight}
+          scrollLeft={scrollLeft}
+          scrollRight={scrollRight}
+          scrollRef={scrollRef as RefObject<HTMLDivElement>}
+        />
+      )}
       <div className="flex flex-col lg:flex-row gap-2">
         {/* Menu Content */}
         <div className="flex-1">

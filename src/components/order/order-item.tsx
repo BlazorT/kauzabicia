@@ -180,8 +180,9 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     router.push(link);
   };
   const onTrackOrder = () => {
+    // console.log(order?.saleid?.toString().slice(-4).padStart(4, "0"));
     const track_url = `${API_URL}/dHJhY2tteW9yZGVy/${btoa(
-      order.saleid?.toString()
+      order?.saleid?.toString().slice(-4).padStart(4, "0")
     )}`;
     window.open(track_url, "_blank");
   };

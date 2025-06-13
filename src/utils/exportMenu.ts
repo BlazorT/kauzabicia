@@ -2,7 +2,7 @@ import { COMPANY_NAME } from "@/constants/constants";
 import { API_URL } from "@/services/apiClient";
 import axios from "axios";
 import jsPDF from "jspdf";
-import { getItemDiscount, getItemPrice } from "./menuUtils";
+import { cleanPath, getItemDiscount, getItemPrice } from "./menuUtils";
 import { DealItem, MenuCategory, MenuItem, StoreInfo } from "./types";
 
 const imageCache = new Map<string, string>();
@@ -94,11 +94,8 @@ const isDealItem = (item: MenuItem | DealItem): item is DealItem => {
 };
 
 // Helper functions for item properties
-const getItemImageUrl = (item: MenuItem | DealItem): string | null => {
-  if (isDealItem(item)) {
-    return API_URL + item.dealUrl;
-  }
-  return API_URL + item.producturl;
+const getItemImageUrl = (item: MenuItem): string | null => {
+  return cleanPath(item.producturl);
 };
 
 const getItemName = (item: MenuItem | DealItem): string => {

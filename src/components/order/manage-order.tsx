@@ -69,9 +69,14 @@ const ManageOrder: React.FC<ManageOrderProps> = ({
       const orderLocation = parseLatandLong(orderDetail?.gpsLocation);
       setSelectedPosition([orderLocation.latitude, orderLocation.longitude]);
     }
-    router.push(
-      `/${btoa(order?.sku)}/?saleId=${btoa(order?.saleId?.toString())}`
-    );
+    let link = "";
+    if (user?.roleId === USER_ROLE.USER) {
+      link = `/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    } else {
+      link = `/dashboard/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    }
+    router.push(link);
+
     clearCart();
     resetOrderInfo();
   };

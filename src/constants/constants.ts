@@ -130,3 +130,4 @@ export const MIN_PRICE = 1;
 export const IMAGE_MIN = 400;
 export const IMAGE_MAX = 1300;
 export const DEFAULT_STORE_ID = 1;
+export const LINKEDIN = "https://www.linkedin.com/company/kalida";

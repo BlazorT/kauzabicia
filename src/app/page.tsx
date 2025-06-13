@@ -3,6 +3,7 @@
 import HomeFilters from "@/components/home/home-filters";
 import HomeHeader from "@/components/home/home-header";
 import HomeStores from "@/components/home/home-stores";
+import Footer from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
@@ -40,7 +41,7 @@ const Home = () => {
           />
         </div>
       </div>
-
+      <Footer />
       {/* Filter Sheet for small screens */}
       <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
         <SheetContent side="left" className="min-w-full">

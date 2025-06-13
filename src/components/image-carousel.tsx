@@ -19,11 +19,20 @@ import { createPortal } from "react-dom";
 interface ImageCarouselProps {
   item: MenuItem;
   className?: string;
+  selectedImage: number;
+  setSelectedImage: React.Dispatch<React.SetStateAction<number>>;
+  setIsLightboxOpen: (value: boolean) => void;
+  isLightboxOpen: boolean;
 }
 
-const ImageCarousel: React.FC<ImageCarouselProps> = ({ item, className }) => {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+const ImageCarousel: React.FC<ImageCarouselProps> = ({
+  item,
+  className,
+  setIsLightboxOpen,
+  isLightboxOpen,
+  setSelectedImage,
+  selectedImage,
+}) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
@@ -43,13 +52,6 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ item, className }) => {
 
   const handleNext = () => {
     setSelectedImage((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
-  };
-
-  const handleLightboxClose = (e: React.MouseEvent) => {
-    // Only close if clicking the backdrop (outside the content)
-    if (e.target === e.currentTarget) {
-      setIsLightboxOpen(false);
-    }
   };
 
   return (
@@ -141,25 +143,20 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ item, className }) => {
       {/* Lightbox Portal */}
       {typeof window !== "undefined" &&
         createPortal(
-          <div
-            className="fixed inset-0 z-[99999999]"
-            onClick={handleLightboxClose}
-          >
-            <Lightbox
-              open={isLightboxOpen}
-              close={() => setIsLightboxOpen(false)}
-              index={selectedImage}
-              slides={imageUrls.map((img) => ({
-                src: img,
-                title: item.productname,
-                description: item.description,
-              }))}
-              plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
-              styles={{ container: { zIndex: 99999999 } }}
-              carousel={{ finite: true }}
-              controller={{ closeOnBackdropClick: false }}
-            />
-          </div>,
+          <Lightbox
+            open={isLightboxOpen}
+            close={() => setIsLightboxOpen(false)}
+            index={selectedImage}
+            slides={imageUrls.map((img) => ({
+              src: img,
+              title: item.productname,
+              description: item.description,
+            }))}
+            plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
+            styles={{ container: { zIndex: 99999999 } }}
+            carousel={{ finite: true }}
+            controller={{ closeOnBackdropClick: false }}
+          />,
           document.body
         )}
     </>

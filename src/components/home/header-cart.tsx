@@ -17,9 +17,9 @@ const HeaderCart = () => {
     if (items.length === 0) return;
     if (!user) {
       showAlert({
-        title: "Heads Up!",
+        title: "Sign In!",
         description:
-          "To access and proceed with your quotations, please sign in. It only takes a moment!",
+          "To see more details or for detailed view, your need login, please sign in and proceed!",
         confirmText: "Sign In Now",
         onConfirm: () => router.push(`/auth/signin`),
         cancelText: "Cancel",

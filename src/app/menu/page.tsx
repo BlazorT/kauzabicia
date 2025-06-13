@@ -9,7 +9,9 @@ import { BookingInfo, CustomerInfo } from "@/components/order/order-detail";
 import { StoreHero } from "@/components/store/store-hero";
 import { StoreLayout } from "@/components/store/store-layout";
 import Spinner from "@/components/ui/spinner";
+import { USER_ROLE } from "@/constants/constants";
 import { useAlert } from "@/context/alert-context";
+import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { ConfigState, useConfig } from "@/context/config-context";
 import { useOrder } from "@/context/order-context";
@@ -46,6 +48,7 @@ export default function StorePage() {
 
   const { storeData } = useStoreInfo(storeId);
   const { addItem } = useCart();
+  const { user } = useAuth();
   const { setOrderInfo } = useOrder();
   const searchParams = useSearchParams();
   const isStoreOpen = storeData?.isStoreOpen ?? false;
@@ -124,23 +127,23 @@ export default function StorePage() {
     );
   }, [items, allMenuItemIds]);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (items.length === 0) return;
+  // useEffect(() => {
+  //   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  //     if (items.length === 0) return;
 
-      const message =
-        "You have items in your cart. Are you sure you want to leave this page?";
-      e.preventDefault();
-      e.returnValue = message; // Required for Chrome
+  //     const message =
+  //       "You have items in your cart. Are you sure you want to leave this page?";
+  //     e.preventDefault();
+  //     e.returnValue = message; // Required for Chrome
 
-      return message; // For some older browsers
-    };
+  //     return message; // For some older browsers
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [items]);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [items]);
 
   useEffect(() => {
     if (
@@ -348,9 +351,14 @@ export default function StorePage() {
           }))
         : [],
     }));
-    router.replace(
-      `/${btoa(order?.sku)}/?saleId=${btoa(order?.saleId?.toString())}`
-    );
+    let link = "";
+    if (user?.roleId === USER_ROLE.USER) {
+      link = `/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    } else {
+      link = `/dashboard/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    }
+    router.replace(link);
+
     // toggleShowMenu();
   };
 

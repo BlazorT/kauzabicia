@@ -34,6 +34,7 @@ import {
   isDistanceBufferValid,
 } from "@/utils/storeUtils";
 import { BookingInfo } from "../order/order-detail";
+import { USER_ROLE } from "@/constants/constants";
 
 type PlaceOrderProps = {
   guestsCollapsibleRef: RefObject<COLLAPSIBLE_REF | null>;
@@ -590,7 +591,13 @@ export default function PlaceOrder({
             });
 
             if (isValidOrderEdit) {
-              router.replace(`/orders/${btoa(atob(saleId).toString())}`);
+              let link = "";
+              if (user?.roleId === USER_ROLE.USER) {
+                link = `/orders/${btoa(atob(saleId).toString())}`;
+              } else {
+                link = `/dashboard/orders/${btoa(atob(saleId).toString())}`;
+              }
+              router.replace(link);
               hideAlert();
               resetOrderInfo();
               setTimeout(() => {
@@ -773,10 +780,11 @@ export default function PlaceOrder({
             (incl. fees and tax)
           </span>
         </div>
-        <span>
-          {" "}
-          {currencyCode} {totalOrderAmount?.toFixed(2)}
-        </span>
+        <span
+          dangerouslySetInnerHTML={{
+            __html: `${currencyCode} ${totalOrderAmount?.toFixed(2)}`,
+          }}
+        />
       </div>
       <div className="flex gap-2 max-w-screen-md mx-auto">
         {items.length > 0 && (

@@ -45,7 +45,7 @@ export const CategoryNav = ({
         )}
 
         <div ref={scrollRef} className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-5 py-1 min-w-max">
+          <div className="flex gap-5 py-0 min-w-max">
             {categories.map((category) => (
               <CategoryButton
                 key={category.id}

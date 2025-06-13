@@ -13,6 +13,10 @@ interface MenuItemDetailProps {
   mostlyBoughtTogetherItems: MenuItem[];
   toggleMenuItemDetails: () => void;
   isStoreOpen: boolean;
+  selectedImage: number;
+  setSelectedImage: React.Dispatch<React.SetStateAction<number>>;
+  setIsLightboxOpen: (value: boolean) => void;
+  isLightboxOpen: boolean;
 }
 
 const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
@@ -20,6 +24,10 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
   mostlyBoughtTogetherItems,
   toggleMenuItemDetails,
   isStoreOpen,
+  selectedImage,
+  isLightboxOpen,
+  setIsLightboxOpen,
+  setSelectedImage,
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
@@ -47,7 +55,13 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
       <div className="flex flex-col md:flex-row gap-4 p-4">
         {/* Left side - Image Carousel */}
         <div className="w-full md:w-1/2">
-          <ImageCarousel item={selectedVariation} />
+          <ImageCarousel
+            item={selectedVariation}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            isLightboxOpen={isLightboxOpen}
+            setIsLightboxOpen={setIsLightboxOpen}
+          />
         </div>
 
         {/* Right side - Details */}

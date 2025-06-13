@@ -42,6 +42,7 @@ const StoreConfig = ({
   if (!config) return null;
   const { freeDeliveryAreaInMeters, isDeliveryAllowed, minimumOrderLimit } =
     config;
+
   return (
     <div>
       {!detailedConfig ? (
@@ -62,7 +63,10 @@ const StoreConfig = ({
               {minimumOrderLimit ? (
                 <span className="flex items-center gap-2">
                   <Package2 size={20} />
-                  Min. delivery order {currencyCode}
+                  Min. delivery order
+                  <span
+                    dangerouslySetInnerHTML={{ __html: currencyCode ?? "" }}
+                  />
                   {minimumOrderLimit}
                 </span>
               ) : null}

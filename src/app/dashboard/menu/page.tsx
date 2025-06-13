@@ -9,9 +9,12 @@ import { BookingInfo, CustomerInfo } from "@/components/order/order-detail";
 import { StoreHero } from "@/components/store/store-hero";
 import { StoreLayout } from "@/components/store/store-layout";
 import Spinner from "@/components/ui/spinner";
+import { USER_ROLE } from "@/constants/constants";
 import { useAlert } from "@/context/alert-context";
+import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { ConfigState, useConfig } from "@/context/config-context";
+import { useLOV } from "@/context/lov-context";
 import { useOrder } from "@/context/order-context";
 import { useGetConfig } from "@/hooks/useInitialData";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
@@ -47,6 +50,7 @@ export default function StorePage() {
   const { storeData } = useStoreInfo(storeId);
   const { addItem } = useCart();
   const { setOrderInfo } = useOrder();
+  const { lovs } = useLOV();
   const isStoreOpen = storeData?.isStoreOpen ?? false;
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,6 +112,7 @@ export default function StorePage() {
   const { items, clearCart, storeId: cartSId, removeItem } = useCart();
   const { showAlert } = useAlert();
   const router = useRouter();
+  const { user } = useAuth();
 
   const allMenuItemIds = useMemo(() => {
     return menuData.map((item) => item.productDetailId);
@@ -121,23 +126,23 @@ export default function StorePage() {
     );
   }, [items, allMenuItemIds]);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (items.length === 0) return;
+  // useEffect(() => {
+  //   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  //     if (items.length === 0) return;
 
-      const message =
-        "You have items in your cart. Are you sure you want to leave this page?";
-      e.preventDefault();
-      e.returnValue = message; // Required for Chrome
+  //     const message =
+  //       "You have items in your cart. Are you sure you want to leave this page?";
+  //     e.preventDefault();
+  //     e.returnValue = message; // Required for Chrome
 
-      return message; // For some older browsers
-    };
+  //     return message; // For some older browsers
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [items]);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [items]);
 
   useEffect(() => {
     if (
@@ -232,7 +237,7 @@ export default function StorePage() {
       return;
     onManageOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [saleId, storeData, order_products, menuData]);
+  }, [saleId, storeData, order_products, menuData, lovs?.states]);
 
   const onManageOrder = () => {
     if (!storeData?.isStoreOpen) {
@@ -331,6 +336,13 @@ export default function StorePage() {
       name: parseCustomerInfo?.name ?? "",
       email: parseCustomerInfo?.email ?? "",
       phone: parseCustomerInfo?.contact ?? "",
+      whatsApp: parseCustomerInfo?.whatsapp ?? "",
+      stateId:
+        lovs?.states?.find(
+          (state) =>
+            state.name?.trim()?.toLowerCase() ===
+            parseCustomerInfo?.state?.trim()?.toLowerCase()
+        )?.id ?? 0,
       guests: order?.guestscount?.toString(),
       paymentMethodId: 1,
       orderType: order?.saleTypeId,
@@ -345,9 +357,14 @@ export default function StorePage() {
           }))
         : [],
     }));
-    router.replace(
-      `/${btoa(order?.sku)}/?saleId=${btoa(order?.saleId?.toString())}`
-    );
+    let link = "";
+    if (user?.roleId === USER_ROLE.USER) {
+      link = `/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    } else {
+      link = `/dashboard/menu/?saleId=${btoa(order?.saleId?.toString())}`;
+    }
+    router.replace(link);
+
     // toggleShowMenu();
   };
 

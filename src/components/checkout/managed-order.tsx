@@ -21,7 +21,7 @@ const ManagedOrder = ({ saleId }: { saleId: string }) => {
       onConfirm: () => {
         clearCart();
         resetOrderInfo();
-        replace("/");
+        replace("/dashboard/menu");
       },
     });
   };
