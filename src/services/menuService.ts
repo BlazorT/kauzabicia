@@ -9,6 +9,7 @@ import apiClient from "./apiClient";
 
 export const menuService = {
   getMenu: async (menuBody: Partial<MENU_FORM>): Promise<RESPONSE> => {
+    // console.log({ menuBody });
     const response = await apiClient.post(
       "/api/blazorApi/storeproductsmenu",
       menuBody

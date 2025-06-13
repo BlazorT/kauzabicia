@@ -1,20 +1,14 @@
+import { cn } from "@/lib/utils";
 import { getImageUrlsFromVariation } from "@/utils/menuUtils";
 import { MenuItem } from "@/utils/types";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
-import Lightbox from "yet-another-react-lightbox";
-import Captions from "yet-another-react-lightbox/plugins/captions";
 import "yet-another-react-lightbox/plugins/captions.css";
-import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
-import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
-import { createPortal } from "react-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface ImageCarouselProps {
   item: MenuItem;
@@ -29,7 +23,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   item,
   className,
   setIsLightboxOpen,
-  isLightboxOpen,
+  // isLightboxOpen,
   setSelectedImage,
   selectedImage,
 }) => {
@@ -116,49 +110,45 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
         {/* Thumbnails */}
         {imageUrls.length > 1 && (
-          <div className="flex gap-2 justify-center">
+          <div
+            // Key changes here:
+            className="flex gap-2 w-full overflow-x-auto pb-2 min-w-0"
+            // To ensure scrollbar hides on mobile (if you have the plugin/custom CSS for it)
+            // If you removed scrollbar-hide, add it back or ensure your custom CSS works.
+            // On iOS, this can help smooth out scrolling:
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {imageUrls.map((image, index) => (
-              <div
+              <Avatar
                 key={index}
                 className={cn(
-                  "relative w-16 h-16 cursor-pointer border-2 rounded-md overflow-hidden",
+                  "relative w-16 h-16 flex-shrink-0 cursor-pointer border-2 rounded-md overflow-hidden",
                   selectedImage === index
                     ? "border-primary"
                     : "border-transparent"
                 )}
                 onClick={() => setSelectedImage(index)}
               >
-                <Image
+                <AvatarImage
                   src={image}
                   alt={`${item.productname} thumbnail ${index + 1}`}
-                  fill
+                  // fill
                   className="object-cover"
                 />
-              </div>
+                <AvatarFallback asChild>
+                  <Image
+                    src={"/no-image.png"}
+                    alt={`${item.productname} thumbnail ${index + 1}`}
+                    className="object-cover"
+                    quality={20}
+                    fill
+                  />
+                </AvatarFallback>
+              </Avatar>
             ))}
           </div>
         )}
       </div>
-
-      {/* Lightbox Portal */}
-      {typeof window !== "undefined" &&
-        createPortal(
-          <Lightbox
-            open={isLightboxOpen}
-            close={() => setIsLightboxOpen(false)}
-            index={selectedImage}
-            slides={imageUrls.map((img) => ({
-              src: img,
-              title: item.productname,
-              description: item.description,
-            }))}
-            plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
-            styles={{ container: { zIndex: 99999999 } }}
-            carousel={{ finite: true }}
-            controller={{ closeOnBackdropClick: false }}
-          />,
-          document.body
-        )}
     </>
   );
 };

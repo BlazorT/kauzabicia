@@ -120,7 +120,7 @@ export default function OrderCustomer({
           </p>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-row gap-2">
         <Input
           id="whatsApp"
           placeholder="Whatsapp"
@@ -135,9 +135,9 @@ export default function OrderCustomer({
           inputMode="numeric" // improves UX on mobile
           pattern="[0-9]*" // allows only digits
           maxLength={13} // HTML-level safeguard
-          className="flex-3/4"
+          className="flex-1/2 sm:flex-3/4"
         />
-        <div className="flex-1/5 flex items-center gap-2">
+        <div className="flex-1/2 sm:flex-1/5 flex items-center gap-2">
           <Checkbox
             id={"whatsapp"}
             checked={isWhatsapp}

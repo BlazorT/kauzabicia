@@ -69,10 +69,6 @@ const OrderDetail = () => {
     [lovs?.statuses, order]
   );
 
-  const orderType = useMemo(
-    () => lovs?.ordertypes?.find((s) => s.id === order?.saleTypeId)?.name,
-    [lovs?.ordertypes, order]
-  );
   //   const { storeData } = useStoreInfo(order_products[0]?.stor?.toString());
 
   const hasPassed48Hours =
@@ -117,7 +113,6 @@ const OrderDetail = () => {
                   {order.tradeName} - {order.storeAddress}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {orderType},{" "}
                   {orderStatus === "Active" ? "Placed" : orderStatus} on{" "}
                   {moment
                     .utc(order.lastUpdatedAt)

@@ -41,7 +41,6 @@ export type BookingInfo = {
 
 const OrderDetails: React.FC<OrderDetailProps> = ({ order }) => {
   const { lovs } = useLOV();
-  // console.log({ order });
   const isDeliveryOption =
     order.deliveryOptionId !== 0 && order.saleTypeId === 3
       ? lovs?.deliveryoptions?.find((d) => d.id === order.deliveryOptionId)

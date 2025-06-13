@@ -355,9 +355,7 @@ export default function PlaceOrder({
           })
         : "";
 
-    const serviceCharges = parseFloat(
-      getTaxAmount(totalPrice, config?.serviceCharges ?? 0)
-    );
+    const serviceCharges = orderInfo.serviceCharges;
 
     const deliveryCharges = orderInfo.deliveryCharges;
 
@@ -520,6 +518,7 @@ export default function PlaceOrder({
       payableAmount: parseFloat(
         getPayableAmount(totalPrice, config, orderInfo)
       ),
+      dueAmount: parseFloat(getPayableAmount(totalPrice, config, orderInfo)),
       paidAmount: paidAmount,
       paymentStatusId: orderInfo.paymentMethodId === 2 ? 1 : 0,
       paymentMethodId: orderInfo?.paymentMethodId ?? 0,
@@ -604,8 +603,14 @@ export default function PlaceOrder({
                 clearCart();
               }, 1000);
             } else {
+              let link = "";
+              if (user?.roleId === USER_ROLE.USER) {
+                link = `/menu`;
+              } else {
+                link = `/dashboard/menu`;
+              }
               setTimeout(() => {
-                router.replace(`/menu`);
+                router.replace(link);
               }, 4000);
 
               setTimeout(() => {

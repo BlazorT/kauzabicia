@@ -29,8 +29,8 @@ export const calculateTotal = (product: OrderProduct) => {
 
 export const getDueAmount = (product: OrderProduct) => {
   //
-  const totalPrice =
-    product.payableBill - (product.voucherAmount + product.pointsAmount);
+  if (!product) return "0";
+  const totalPrice = product.payableBill - product.paidAmount;
 
   return totalPrice.toFixed(2);
 };

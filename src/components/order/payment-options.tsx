@@ -1,25 +1,14 @@
-import { paymentGatewayDescriptions, USER_ROLE } from "@/constants/constants";
+import { USER_ROLE } from "@/constants/constants";
 import { useAuth } from "@/context/auth-context";
 import { ErrorVariant, useError } from "@/context/error-context";
 import { useOrder } from "@/context/order-context";
-import { useJazzCash } from "@/hooks/useJazzCash";
-import {
-  getOrdersQueryKey,
-  usePaymentGateways,
-  useUpdateOrder,
-} from "@/hooks/useOrder";
-import { isSixDigitNumber, isValidMobileNumber } from "@/utils/formUtils";
-import { filterActiveGateways } from "@/utils/paymentUtils";
-import { ORDER } from "@/utils/types";
+import { getOrdersQueryKey, useUpdateOrder } from "@/hooks/useOrder";
+import { ORDER, OrderProduct } from "@/utils/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Banknote } from "lucide-react";
 import moment from "moment";
-import { useEffect, useMemo, useRef } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import JazzCashConfirm from "../checkout/jazz-cash-confirm";
-import JCInitiateLoading from "../checkout/jazz-cash-initiate-load";
-import { PaymentMethodCard } from "../checkout/payment-method-card";
-import { ErrorState } from "../store/store-status";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -29,46 +18,33 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { ErrorSnackbar } from "../ui/error-snackbar";
-import { RadioGroup } from "../ui/radio-group";
+import { Input } from "../ui/input";
 import Spinner from "../ui/spinner";
-import { useEasyPaisa } from "@/hooks/useEasyPaisa";
+import OrderSummary from "./order-summary";
 
 type PaymentOptionsProps = {
   isVisible: boolean;
   toggleDialog: () => void;
   order: ORDER;
+  order_products: OrderProduct[];
 };
 
 const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   isVisible,
   toggleDialog,
+  order_products,
   order,
 }) => {
-  const { orderInfo, setOrderInfo, resetOrderInfo } = useOrder();
+  const queryClient = useQueryClient();
+  const { orderInfo, resetOrderInfo } = useOrder();
   const { setError } = useError();
   const { user } = useAuth();
   const { mutate, isPending: pendingUpdate } = useUpdateOrder();
-  const {
-    triggerJazzCashPayment,
-    loadingJC,
-    initiateJCPayment,
-    isPending: paymentInitiatedPending,
-    isPaymentInitiated,
-    isPaymentSuccess,
-    // loadingJC,
-  } = useJazzCash(true);
-  const { prepareRequest } = useEasyPaisa(true);
 
-  const { data, isPending, isError, error } = usePaymentGateways(order.storeid);
+  const original_due = order_products?.[0]?.dueAmount;
+  const [amount, setAmount] = useState("");
 
-  const queryClient = useQueryClient();
-
-  const jazzCashRef = useRef<{ close: () => void }>(null);
-
-  const paymentGatewaysData = useMemo(
-    () => filterActiveGateways({ data: data?.data }),
-    [data]
-  );
+  // const [dueAmount, setDueAmount] = useState(original_due);
 
   const onCancel = () => {
     toggleDialog();
@@ -76,69 +52,30 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   };
 
   const validatePayment = () => {
-    if (orderInfo.paymentGatewayId === 0) {
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
       setError({
-        message: "Please select a gateway to process with your order.",
+        title: "Error",
+        message: "Please enter a valid amount",
         variant: ErrorVariant.Warning,
       });
       return false;
     }
-    if (orderInfo.paymentGateway?.name?.toLowerCase() === "jazzcash") {
-      if (!orderInfo.jazzCashMode) {
-        setError({
-          title: "JazzCash",
-          message:
-            "Please select a jazzcash payment method, you can either pay from mobile acount or pay through card.",
-          variant: ErrorVariant.Warning,
-        });
-        return false;
-      }
-      if (orderInfo.jazzCashMode === "wallet") {
-        if (!isValidMobileNumber(orderInfo.jazzCashNumber)) {
-          setError({
-            title: "JazzCash",
-            message: "Please enter a valid mobile number. e.g 03001234567",
-            variant: ErrorVariant.Warning,
-          });
-          return false;
-        }
-        if (!isSixDigitNumber(orderInfo.jazzCashCNIC)) {
-          setError({
-            title: "JazzCash",
-            message: "Please enter a last 6 digits of your CNIC.",
-            variant: ErrorVariant.Warning,
-          });
-          return false;
-        }
-        initiateJCPayment(
-          (order.payableamount - order.paidamount)?.toFixed(2),
-          order?.saleid?.toString()
-        );
-        // initiateJCPayment("1", order?.saleid?.toString());
-        return false;
-      }
-      if (orderInfo.jazzCashMode === "card") {
-        triggerJazzCashPayment(
-          (order.payableamount - order.paidamount)?.toFixed(2),
-          order?.saleid?.toString()
-        );
-        // triggerJazzCashPayment("1", order?.saleid?.toString());
-        return false;
-      }
-    }
-    if (orderInfo.paymentGateway?.name?.toLowerCase() === "easypaisa") {
-      prepareRequest(
-        (order.payableamount - order.paidamount)?.toFixed(1),
-        order?.saleid?.toString()
-      );
-      // prepareRequest(1?.toFixed(1), order?.saleid?.toString());
+    if (numericAmount > original_due) {
+      setError({
+        title: "Error",
+        message: `Amount cannot exceed due amount (${original_due})`,
+        variant: ErrorVariant.Warning,
+      });
       return false;
     }
     return true;
   };
   const onPay = () => {
     if (!validatePayment()) return;
+    placeOrder();
   };
+
   const placeOrder = (paymentData?: string) => {
     const updateOrderBody = {
       id: order.saleid,
@@ -160,22 +97,30 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       tax: 0.0,
       total: order.totalamount,
       payableamount: order.totalamount,
-      paidamount: order.totalamount,
-      paymentStatusId: 1,
-      paymentMethodId: 2,
+      paidamount: parseFloat(
+        (order.paidamount + parseFloat(Number(amount).toFixed(2))).toFixed(2)
+      ),
+      paymentStatusId:
+        Math.abs(order.totalamount - parseFloat(amount)) < 0.01 ? 1 : 0,
+      paymentMethodId: 1,
       paymentRef: paymentData
         ? paymentData
         : btoa(JSON.stringify(orderInfo.jazzCashResponse)),
       handedovercash: 0.0,
       expense: 0.0,
       payingamount: 0.0,
-      dueamount: 0.0,
+      dueamount: parseFloat(
+        (order.totalamount - parseFloat(Number(amount).toFixed(2))).toFixed(2)
+      ),
       netdiscount: 0.0,
       changeamount: 0.0,
       quantity: 0.0,
       createdby: 0,
       saletypeid: order.saleTypeId,
-      status: 5,
+      status:
+        Math.abs(order.totalamount - parseFloat(amount)) < 0.01
+          ? 5
+          : order?.status,
       keyword: "",
       serviceCharges: order?.serviceCharges ?? 0,
       deliveryCharges: order?.deliveryCharges ?? 0,
@@ -184,7 +129,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       lastUpdatedBy: user?.id ?? 0,
       rowVer: order?.rowVer,
     };
-    // console.log({ updateOrderBody });
+    console.log({ updateOrderBody });
+    // return;
     // console.log(JSON.stringify(updateOrderBody));
     mutate(
       { orderBody: updateOrderBody },
@@ -205,7 +151,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             });
             toggleDialog();
             toast.success(
-              `Order #${order.saleid} has been paid and completed succesfully!`
+              `Order #${order.saleid} has been updated succesfully!`
             );
           } else {
             setError({
@@ -219,139 +165,60 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     );
   };
 
-  useEffect(() => {
-    if (isPaymentSuccess) placeOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPaymentSuccess]);
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Optional: check event.origin for security
-      // console.log("Received message from popup:", event.data);
-
-      // Validate the structure
-      if (event.data?.status) {
-        const { message, data, status } = event.data;
-        // console.log("Message:", message);
-        // console.log("Raw Data:", data);
-        // console.log("Parsed data", JSON.parse(atob(data)));
-        if (status === "failed") {
-          setError({
-            title: "Payment Error",
-            message: message,
-            variant: ErrorVariant.Error,
-          });
-        } else {
-          placeOrder(data);
-        }
-
-        // TODO: handle this data in your app (e.g., update state, redirect, etc.)
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string or valid number
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      const numericValue = parseFloat(value);
+      const numericDueAmount = original_due;
+      if (!isNaN(numericValue) && numericValue > numericDueAmount) {
+        setError({
+          title: "Error",
+          message: `Amount cannot exceed ${numericDueAmount}`,
+          variant: ErrorVariant.Warning,
+        });
+        return;
       }
-    };
+      // const numericOriginalDue = parseFloat(original_due);
+      // setDueAmount((numericOriginalDue - numericValue).toFixed(2));
+      setAmount(value);
+    }
+  };
 
-    window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (isError) {
-    return <ErrorState message={error?.message} />;
-  }
-
-  if (isPending || pendingUpdate) {
+  if (pendingUpdate) {
     return <Spinner />;
   }
 
   return (
     <>
-      <JCInitiateLoading isOpen={paymentInitiatedPending} />
-      <JazzCashConfirm
-        ref={jazzCashRef}
-        isVisible={isPaymentInitiated}
-        placeOrder={placeOrder}
-      />
-      <Dialog open={isVisible}>
+      <Dialog open={isVisible} onOpenChange={onCancel}>
         <DialogDescription className="hidden">HI</DialogDescription>
-        <DialogContent
-          hideCloseButton={paymentGatewaysData.length > 0}
-          aria-describedby="pay-options"
-        >
+        <DialogContent aria-describedby="pay-options">
           <DialogHeader>
             <DialogTitle>Payment Options</DialogTitle>
           </DialogHeader>
-          {paymentGatewaysData?.length === 0 ? (
-            <p>
-              No payment gateways available right now, please try again later.
-            </p>
-          ) : (
-            <>
-              <ErrorSnackbar />
-              <RadioGroup
-                onValueChange={(value) => {
-                  const parsedValue = JSON.parse(value);
-                  console.log({ parsedValue });
-                  setOrderInfo((prev) => ({
-                    ...prev,
-                    paymentMethodId:
-                      parsedValue.id === 1 || parsedValue.id === 3
-                        ? parsedValue.id
-                        : 2,
-                    paymentGateway: parsedValue,
-                    paymentGatewayId: parsedValue.id,
-                  }));
-                }}
-                value={orderInfo.paymentGatewayId.toString()}
-                className="w-full flex flex-wrap items-center gap-6 cursor-pointer"
-              >
-                <div className="w-full flex flex-col gap-4">
-                  {paymentGatewaysData?.map((gateway) => {
-                    const key =
-                      (gateway.name?.toLowerCase() as keyof typeof paymentGatewayDescriptions) ??
-                      (gateway.id.toString() as keyof typeof paymentGatewayDescriptions);
-                    const description =
-                      paymentGatewayDescriptions[
-                        orderInfo.jazzCashMode === "card" ? "default" : key
-                      ] ?? null;
-
-                    return (
-                      <PaymentMethodCard
-                        key={gateway.id}
-                        gateway={gateway}
-                        isForced={false}
-                        isSelected={orderInfo.paymentGatewayId === gateway.id}
-                        description={description}
-                      />
-                    );
-                  })}
-                </div>
-              </RadioGroup>
-              <div className="flex gap-3">
-                {loadingJC ? (
-                  <Button className="w-full">
-                    <Loader2 className="animate-spin h-4 w-4" />
-                    Redirecting...
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      onClick={onCancel}
-                      className="flex-1"
-                      variant={"secondary"}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={onPay} className="flex-1">
-                      Pay {order.currencycode}{" "}
-                      {(order.payableamount - order.paidamount)?.toFixed(2)}
-                    </Button>
-                  </>
-                )}
-              </div>
-            </>
-          )}
+          <ErrorSnackbar />
+          <OrderSummary orderItems={order_products} />
+          <div className="relative">
+            <Banknote className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              value={amount}
+              type="text"
+              placeholder="Amount"
+              onChange={handleAmountChange}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Button onClick={onCancel} className="flex-1" variant={"outline"}>
+              Cancel
+            </Button>
+            {parseFloat(amount) > 0 && (
+              <Button onClick={onPay} className="flex-1">
+                Pay {order.currencycode} {parseFloat(amount)?.toFixed(2)}
+              </Button>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </>

@@ -20,7 +20,6 @@ import {
   Clock,
   Code,
   DollarSign,
-  Info,
   Loader2,
   Package,
   Percent,
@@ -56,7 +55,7 @@ import {
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Textarea } from "../ui/textarea"; // Assuming you have a Textarea component
+import RichTextEditor from "../ui/rich-text-editor";
 import Spinner from "../ui/spinner";
 interface ProductUnit {
   createdAt: string;
@@ -113,10 +112,7 @@ const formSchema = z.object({
     .int("Ready time must be an integer")
     .refine((val) => !isNaN(val), { message: "Ready time must be a number" }),
   status: z.number().optional(),
-  description: z
-    .string()
-    .max(300, "Description cannot exceed 300 characters")
-    .optional(),
+  description: z.string().optional(),
   code: z.string().max(20, "Code cannot exceed 20 characters").optional(),
   images: z
     .array(
@@ -311,7 +307,7 @@ const ProductSettingForm = () => {
     // Handle image uploads first
     // Now, handle the product data submission with the uploaded image URLs
     const productData = {
-      Id: updating_product?.productDetailId ?? 0,
+      Id: productDetailId ?? 0,
       Barcode: values.code,
       ProductId: parseInt(values.productId),
       StoreId: 1,
@@ -332,12 +328,12 @@ const ProductSettingForm = () => {
       lastUpdatedBy: user?.id,
     };
 
-    // console.log("Submitting Product Data:", productData);
+    console.log("Submitting Product Data:", productData);
     // console.log(JSON.stringify(productData));
 
     mutate(productData, {
       onSuccess: async (res) => {
-        // console.log(res);
+        console.log(res);
         if (res?.status == true) {
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.MENU, "1", "0"],
@@ -756,20 +752,16 @@ const ProductSettingForm = () => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <Info className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
-                  <Textarea
-                    placeholder="Provide a detailed description of the product (max 300 characters)"
-                    {...field}
-                    className="min-h-[80px] pl-9 resize-y"
-                    maxLength={300}
-                  />
-                </div>
+                <RichTextEditor
+                  value={field.value || ""} // Ensure value is a string
+                  onChange={field.onChange}
+                  placeholder="Provide a detailed description of the product..."
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
-        />{" "}
+        />
         <div className="flex justify-center items-center">
           <FormField
             control={form.control}
@@ -869,7 +861,7 @@ const ProductSettingForm = () => {
           {(form.formState.isSubmitting ||
             isPendingImageUpload ||
             isPendingAddUpdate) && <Loader2 className="animate-spin mr-2" />}
-          {updating_product ? "Update Product" : "Save Product"}
+          {productDetailId ? "Update Product" : "Save Product"}
         </Button>
       </form>
     </Form>

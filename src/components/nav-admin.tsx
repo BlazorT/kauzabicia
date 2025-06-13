@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { Separator } from "./ui/separator";
 
 export function NavAdmin({
   projects,
@@ -26,7 +27,7 @@ export function NavAdmin({
     <SidebarGroup className="">
       <SidebarGroupLabel>Store | Restaurant</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
+        {projects.map((item, index) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <Link href={item.url}>
@@ -34,6 +35,7 @@ export function NavAdmin({
                 <span>{item.name}</span>
               </Link>
             </SidebarMenuButton>
+            {projects.length !== index + 1 && <Separator />}
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

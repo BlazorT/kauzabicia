@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
     // }
 
     // Unauthenticated users accessing dashboard should go to menu
-    if (pathname === "/dashboard") {
+    if (pathname.includes("/dashboard")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 

@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
+import { cleanPath } from "@/utils/menuUtils";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -260,7 +261,7 @@ const OrderReview: React.FC<OrderReviewProps> = ({ orderItems }) => {
                     <div className="flex items-center gap-2">
                       {item.url && (
                         <Image
-                          src={`${BASE_URL}${item.url}`}
+                          src={cleanPath(item.url)}
                           alt={item.productName}
                           width={48}
                           height={48}

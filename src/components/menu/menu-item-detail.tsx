@@ -52,7 +52,7 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
       className="max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[70%] p-0 max-h-[90vh] gap-1 overflow-y-auto"
     >
       <DialogTitle className="hidden"></DialogTitle>
-      <div className="flex flex-col md:flex-row gap-4 p-4">
+      <div className="flex flex-col md:flex-row gap-4 p-4 overflow-hidden">
         {/* Left side - Image Carousel */}
         <div className="w-full md:w-1/2">
           <ImageCarousel
@@ -76,9 +76,11 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
               item={selectedVariation}
             />
           </div>
-          <p className="text-muted-foreground">
-            {selectedVariation.description}
-          </p>
+          <p
+            className="text-muted-foreground  prose dark:prose-invert max-h-90 md:max-h-150 overflow-y-scroll hide-scrollbar"
+            dangerouslySetInnerHTML={{ __html: selectedVariation.description }}
+          />
+
           <MenuItemVariations
             item={item}
             selectedVariation={selectedVariation}

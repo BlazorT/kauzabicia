@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import ManageOrder from "./manage-order";
 import OrderReview from "./order-review";
+import PayOrder from "./pay-order";
 
 type OrderItemProps = {
   order: ORDER;
@@ -58,8 +59,6 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     () => orderDetailRes?.data ?? [],
     [orderDetailRes]
   ) as OrderProduct[];
-
-  // console.log(order_products);
 
   const { color: delayColor, label: delayLabel } = getOrderDelayColor(
     order.requireTime,
@@ -181,8 +180,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   };
   const onTrackOrder = () => {
     // console.log(order?.saleid?.toString().slice(-4).padStart(4, "0"));
-    const track_url = `${API_URL}/dHJhY2tteW9yZGVy/${btoa(
-      order?.saleid?.toString().slice(-4).padStart(4, "0")
+    const track_url = `${API_URL}dHJhY2tteW9yZGVy/${btoa(
+      order?.saleid?.toString()
     )}`;
     window.open(track_url, "_blank");
   };
@@ -290,10 +289,10 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
         </div>
         <div className="w-auto flex justify-end items-center gap-2 flex-wrap mt-1 md:mt-0">
           <ManageOrder order_products={order_products} order={order} />
-          {/* {order.paymentStatusId === 0 &&
-            order.payableamount - order.paidamount > 0 && (
-              <PayOrder order={order} />
-            )} */}
+          {order?.status !== 5 &&
+            order?.payableamount - order?.paidamount > 0 && (
+              <PayOrder order={order} order_products={order_products} />
+            )}
           {isActiveOrder && (
             <Button
               onClick={onTrackOrder}

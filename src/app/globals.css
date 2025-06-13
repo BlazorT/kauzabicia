@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
+@plugin "@tailwindcss/typography";
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -294,4 +294,36 @@ input[type="number"] {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* In your global CSS file (e.g., globals.css) or a specific CSS module */
+/* In your globals.css or a relevant CSS file */
+
+.prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  /* Reduce margins */
+  margin-top: 0.25em !important; /* Adjust as needed, !important might be needed for specificity */
+  margin-bottom: 0.25em !important;
+
+  /* Or remove them entirely */
+  /* margin-top: 0 !important; */
+  /* margin-bottom: 0 !important; */
+}
+
+.prose :where(ol):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  /* Reduce margins */
+  margin-top: 0.05em !important; /* Adjust as needed, !important might be needed for specificity */
+  margin-bottom: 0.05em !important;
+
+  /* Or remove them entirely */
+  /* margin-top: 0 !important; */
+  /* margin-bottom: 0 !important; */
+}
+.prose :where(ul):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  /* Reduce margins */
+  margin-top: 0.05em !important; /* Adjust as needed, !important might be needed for specificity */
+  margin-bottom: 0.05em !important;
+
+  /* Or remove them entirely */
+  /* margin-top: 0 !important; */
+  /* margin-bottom: 0 !important; */
 }

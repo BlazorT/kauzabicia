@@ -1,13 +1,14 @@
-import { ORDER } from "@/utils/types";
+import { ORDER, OrderProduct } from "@/utils/types";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import PaymentOptions from "./payment-options";
 
 type PayOrderProps = {
   order: ORDER;
+  order_products: OrderProduct[];
 };
 
-const PayOrder: React.FC<PayOrderProps> = ({ order }) => {
+const PayOrder: React.FC<PayOrderProps> = ({ order, order_products }) => {
   const [isPaymenyOptionsVisible, setIsPaymentOptionsVisible] = useState(false);
 
   const toggleIsPaymentOptionsVisible = () =>
@@ -27,6 +28,7 @@ const PayOrder: React.FC<PayOrderProps> = ({ order }) => {
         isVisible={isPaymenyOptionsVisible}
         toggleDialog={toggleIsPaymentOptionsVisible}
         order={order}
+        order_products={order_products}
       />
     </>
   );
