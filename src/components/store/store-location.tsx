@@ -15,7 +15,7 @@ export const StoreLocation = ({
   expanded = false,
 }: StoreLocationProps) => {
   const mapCoords = gpsLocation?.split(",").reverse().join(",");
-  console.log(mapCoords);
+  // console.log(mapCoords);
   return (
     <div className="space-y-4">
       {gpsLocation && (

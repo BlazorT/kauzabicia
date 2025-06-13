@@ -289,7 +289,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
         </div>
         <div className="w-auto flex justify-end items-center gap-2 flex-wrap mt-1 md:mt-0">
           <ManageOrder order_products={order_products} order={order} />
-          {order?.status !== 5 &&
+          {user?.roleId !== USER_ROLE?.USER &&
+            order?.status !== 5 &&
             order?.payableamount - order?.paidamount > 0 && (
               <PayOrder order={order} order_products={order_products} />
             )}

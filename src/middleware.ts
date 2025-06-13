@@ -49,12 +49,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // 🧭 Handle root path "/"
-  if (pathname === "/") {
-    if (user?.roleId !== USER_ROLE.USER) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-  }
+  // // 🧭 Handle root path "/"
+  // if (pathname === "/") {
+  //   if (user?.roleId !== USER_ROLE.USER) {
+  //     return NextResponse.redirect(new URL("/dashboard", request.url));
+  //   }
+  // }
 
   // 🚫 Public users can't access /dashboard
   if (pathname === "/dashboard" && user?.roleId === USER_ROLE.USER) {

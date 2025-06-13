@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { User } from "@/utils/types";
 import { useCart } from "./cart-context";
+import { USER_ROLE } from "@/constants/constants";
 
 interface AuthContextType {
   user: User | null;
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (items?.length > 0) {
       router.push("/menu");
     } else {
-      router.push("/");
+      router.push(userData?.roleId === USER_ROLE.USER ? "/" : "/dashboard");
     }
   };
 
