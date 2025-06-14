@@ -45,6 +45,7 @@ export const MenuItem = ({
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const imageUrls = getImageUrlsFromVariation(item);
 
@@ -118,6 +119,7 @@ export const MenuItem = ({
   }, [item, showProductId]);
 
   // console.log({ item: item.menuJSON, id: item.productname });
+
   return (
     <>
       <Card className="px-2 py-2">
@@ -190,7 +192,7 @@ export const MenuItem = ({
               title: item.productname,
               description: item.description,
             }))}
-            plugins={[Captions, Fullscreen, Slideshow, Thumbnails, Zoom]}
+            plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
             styles={{ container: { zIndex: 99999999 } }}
             carousel={{ finite: true }}
             controller={{ closeOnBackdropClick: false }}
@@ -198,6 +200,45 @@ export const MenuItem = ({
               maxZoomPixelRatio: 4, // 🔍 Increase zoom level (default is 2)
               zoomInMultiplier: 2, // Controls how fast it zooms in
               doubleTapDelay: 300, // Optional: adjust responsiveness
+            }}
+            render={{
+              slideFooter: ({ slide }) => {
+                const currentItem = imageUrls.find((url) => url === slide.src);
+
+                if (!currentItem || !slide.description) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    className="absolute w-[100dvw] bottom-0"
+                    style={{
+                      padding: "16px",
+                      color: "white",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    }}
+                  >
+                    <div className="prose dark:prose-invert text-sm text-white space-y-2 max-h-[90dvh]">
+                      <div
+                        className={`transition-all duration-300 ${
+                          expanded
+                            ? "max-h-[50dvh] overflow-y-auto pr-2"
+                            : "line-clamp-3"
+                        } hide-scrollbar`}
+                        dangerouslySetInnerHTML={{
+                          __html: String(slide.description ?? ""),
+                        }}
+                      />
+                      <button
+                        onClick={() => setExpanded(!expanded)}
+                        className="text-xs underline text-amber-300"
+                      >
+                        {expanded ? "See less" : "See more"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              },
             }}
           />,
           document.body

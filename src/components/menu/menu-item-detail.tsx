@@ -77,7 +77,7 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
             />
           </div>
           <p
-            className="text-muted-foreground  prose dark:prose-invert max-h-90 md:max-h-150 overflow-y-scroll hide-scrollbar"
+            className="text-muted-foreground  prose dark:prose-invert max-h-90 md:max-h-150 pb-32 bg-background md:pb-0 overflow-y-scroll hide-scrollbar"
             dangerouslySetInnerHTML={{ __html: selectedVariation.description }}
           />
 
