@@ -61,10 +61,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       });
       return false;
     }
-    if (numericAmount > original_due) {
+    if (numericAmount > parseFloat(original_due?.toFixed(2))) {
       setError({
         title: "Error",
-        message: `Amount cannot exceed due amount (${original_due})`,
+        message: `Amount cannot exceed due amount (${original_due?.toFixed(
+          2
+        )})`,
         variant: ErrorVariant.Warning,
       });
       return false;
@@ -101,7 +103,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         (order.paidamount + parseFloat(Number(amount).toFixed(2))).toFixed(2)
       ),
       paymentStatusId:
-        Math.abs(order.totalamount - parseFloat(amount)) < 0.01 ? 1 : 0,
+        order.totalamount ===
+        parseFloat(
+          (order.paidamount + parseFloat(Number(amount).toFixed(2))).toFixed(2)
+        )
+          ? 1
+          : 0,
       paymentMethodId: 1,
       paymentRef: paymentData
         ? paymentData
@@ -118,7 +125,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       createdby: 0,
       saletypeid: order.saleTypeId,
       status:
-        Math.abs(order.totalamount - parseFloat(amount)) < 0.01
+        order.totalamount ===
+        parseFloat(
+          (order.paidamount + parseFloat(Number(amount).toFixed(2))).toFixed(2)
+        )
           ? 5
           : order?.status,
       keyword: "",
@@ -170,11 +180,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     // Allow empty string or valid number
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
       const numericValue = parseFloat(value);
-      const numericDueAmount = original_due;
+      const numericDueAmount = parseFloat(original_due?.toFixed(2));
       if (!isNaN(numericValue) && numericValue > numericDueAmount) {
         setError({
           title: "Error",
-          message: `Amount cannot exceed ${numericDueAmount}`,
+          message: `Amount cannot exceed ${numericDueAmount?.toFixed(2)}`,
           variant: ErrorVariant.Warning,
         });
         return;
@@ -195,7 +205,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         <DialogDescription className="hidden">HI</DialogDescription>
         <DialogContent aria-describedby="pay-options">
           <DialogHeader>
-            <DialogTitle>Payment Options</DialogTitle>
+            <DialogTitle>
+              {" "}
+              Order #{order?.saleid} | Token #
+              {order?.salesinvoicecode?.toString().slice(-4).padStart(4, "0")}
+            </DialogTitle>
           </DialogHeader>
           <ErrorSnackbar />
           <OrderSummary orderItems={order_products} />

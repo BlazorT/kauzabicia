@@ -19,7 +19,6 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import ManageOrder from "./manage-order";
-import OrderReview from "./order-review";
 import PayOrder from "./pay-order";
 
 type OrderItemProps = {
@@ -317,7 +316,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
             )}
           </Button>
         </div>
-        <OrderReview orderItems={order_products} />
+        {/* <OrderReview orderItems={order_products} /> */}
       </CardContent>
     </Card>
   );

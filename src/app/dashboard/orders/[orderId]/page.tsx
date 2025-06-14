@@ -2,12 +2,10 @@
 
 import OrderDetails from "@/components/order/order-detail";
 import OrderInvoice from "@/components/order/order-invoice";
-import OrderReview from "@/components/order/order-review";
 import OrderSummary from "@/components/order/order-summary";
 import { ErrorState } from "@/components/store/store-status";
 import { Card, CardContent } from "@/components/ui/card";
 import Spinner from "@/components/ui/spinner";
-import { useAuth } from "@/context/auth-context";
 import { useLOV } from "@/context/lov-context";
 import { useFetchOrderDetails } from "@/hooks/useOrder";
 import { API_URL } from "@/services/apiClient";
@@ -15,12 +13,11 @@ import { OrderProduct } from "@/utils/types";
 import moment from "moment";
 import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 const OrderDetail = () => {
   const params = useParams();
   const { lovs } = useLOV();
-  const { user } = useAuth();
   const encodedOrderId = params.orderId; // Get the potentially encoded orderId
 
   let orderId: string | null = null;
@@ -71,22 +68,22 @@ const OrderDetail = () => {
 
   //   const { storeData } = useStoreInfo(order_products[0]?.stor?.toString());
 
-  const hasPassed48Hours =
-    order?.lastUpdatedAt &&
-    moment.utc(order.lastUpdatedAt).diff(moment.utc(), "hours") > 48;
+  // const hasPassed48Hours =
+  //   order?.lastUpdatedAt &&
+  //   moment.utc(order.lastUpdatedAt).diff(moment.utc(), "hours") > 48;
 
-  const [hasReviewed, setHasReviewed] = useState(false);
+  // const [hasReviewed, setHasReviewed] = useState(false);
 
-  useEffect(() => {
-    const reviewedOrders = JSON.parse(
-      localStorage.getItem("reviewedOrders") || "{}"
-    );
-    const orderKey = `${order?.saleId}_${user?.id || process.env.KIOSK_ID}`;
-    setHasReviewed(!!reviewedOrders[orderKey]);
-  }, [order?.saleId, user?.id]);
+  // useEffect(() => {
+  //   const reviewedOrders = JSON.parse(
+  //     localStorage.getItem("reviewedOrders") || "{}"
+  //   );
+  //   const orderKey = `${order?.saleId}_${user?.id || process.env.KIOSK_ID}`;
+  //   setHasReviewed(!!reviewedOrders[orderKey]);
+  // }, [order?.saleId, user?.id]);
 
-  const canReview =
-    user && order?.status === 5 && !hasPassed48Hours && !hasReviewed;
+  // const canReview =
+  //   user && order?.status === 5 && !hasPassed48Hours && !hasReviewed;
 
   if (isPending) return <Spinner />;
   if (isError) return <ErrorState message={error.message} />;
@@ -132,13 +129,13 @@ const OrderDetail = () => {
       </div>
       <div className="col-span-3 lg:col-span-2 space-y-3">
         <OrderDetails order={order} />
-        {canReview && (
+        {/* {canReview && (
           <Card className="p-0">
             <CardContent className="p-3 flex gap-3">
               <OrderReview orderItems={order_products} />
             </CardContent>
           </Card>
-        )}
+        )} */}
         <OrderInvoice orderItems={order_products} />
       </div>
     </div>

@@ -5,6 +5,7 @@ import {
   Bot,
   GalleryVerticalEnd,
   HandPlatter,
+  ScrollText,
   Settings2,
   ShoppingBasket,
   SquareTerminal,
@@ -150,6 +151,11 @@ const data = {
       name: "Product Settings",
       url: "/dashboard/product-setting",
       icon: ShoppingBasket,
+    },
+    {
+      name: "Orders",
+      url: "/dashboard/orders",
+      icon: ScrollText,
     },
   ],
 };

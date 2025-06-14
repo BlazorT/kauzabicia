@@ -27,7 +27,6 @@ import ExportMenu from "./export-menu";
 import StoreConfig from "./store-config";
 import { StoreHours } from "./store-hours";
 import { StoreLocation } from "./store-location";
-import { StoreRating } from "./store-rating";
 
 interface StoreHeaderProps {
   name: string;
@@ -253,7 +252,7 @@ export const StoreHeader = ({
             <StoreConfig store={store} detailedConfig={false} />
 
             <div className="flex flex-wrap gap-3 items-center">
-              <StoreRating rating={store.rating} store={store} showReviews />
+              {/* <StoreRating rating={store.rating} store={store} showReviews /> */}
 
               <Dialog>
                 <DialogTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary w-fit">
