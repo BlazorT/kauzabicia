@@ -22,6 +22,11 @@ import { MenuItemHeader } from "./menu-item-header";
 import { MenuItemImage } from "./menu-item-image";
 import { MenuItemPricing } from "./menu-item-pricing";
 import { MenuItemTags } from "./menu-item-tags";
+import { SlideImage } from "yet-another-react-lightbox";
+
+interface SlideWithDescription extends SlideImage {
+  description?: string;
+}
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -186,11 +191,13 @@ export const MenuItem = ({
             open={isLightboxOpen}
             close={() => setIsLightboxOpen(false)}
             index={selectedImage}
-            slides={imageUrls.map((img) => ({
-              src: img,
-              title: item.productname,
-              description: item.description,
-            }))}
+            slides={
+              imageUrls.map((img) => ({
+                src: img,
+                title: item.productname,
+                description: item.description,
+              })) as SlideWithDescription[]
+            }
             plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
             styles={{ container: { zIndex: 99999999 } }}
             carousel={{ finite: true }}
@@ -201,10 +208,8 @@ export const MenuItem = ({
               doubleTapDelay: 300, // Optional: adjust responsiveness
             }}
             render={{
-              slideFooter: ({ slide }) => {
-                const currentItem = imageUrls.find((url) => url === slide.src);
-
-                if (!currentItem || !slide.description) {
+              slideFooter: ({ slide }: { slide: SlideWithDescription }) => {
+                if (!slide.description) {
                   return null;
                 }
 
