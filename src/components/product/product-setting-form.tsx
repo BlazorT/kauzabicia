@@ -176,12 +176,12 @@ const ProductSettingForm = () => {
   const productDetailId = searchParams.get("id");
 
   const { data: menuResponse, isLoading: isPending } = useMenu(
-    "1",
+    productDetailId ? "1" : "",
     moment().format("YYYY-MM-DDTHH:mm:ss"),
     productDetailId ?? ""
   );
   const updating_product = (menuResponse?.data as MenuItem[])?.[0] ?? null;
-  console.log({ productDetailId });
+  // console.log({ productDetailId, updating_product, menuResponse });
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: uploadImage, isPending: isPendingImageUpload } =
@@ -250,7 +250,12 @@ const ProductSettingForm = () => {
   }, [updating_product, form, productDetailId]);
 
   useEffect(() => {
-    if (updating_product && productDetailId && updating_product.menuJSON) {
+    if (
+      updating_product &&
+      productDetailId &&
+      updating_product.menuJSON &&
+      updating_product.productDetailId === parseInt(productDetailId)
+    ) {
       try {
         const jsonArray = JSON.parse(updating_product.menuJSON) as MenuImage[];
         const existingImages = jsonArray.map((item) => ({
@@ -437,11 +442,11 @@ const ProductSettingForm = () => {
       lastUpdatedBy: user?.id,
     };
 
-    console.log("Submitting Product Data:", productData);
+    // console.log("Submitting Product Data:", productData);
 
     mutate(productData, {
       onSuccess: async (res) => {
-        console.log(res);
+        // console.log(res);
         if (res?.status == true) {
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.MENU, "1", "0"],
@@ -504,9 +509,9 @@ const ProductSettingForm = () => {
             formData.append("userid", user?.id?.toString() ?? "0");
             formData.append("remarks", "");
 
-            for (const [key, value] of formData.entries()) {
-              console.log(key, "=>", value);
-            }
+            // for (const [key, value] of formData.entries()) {
+            //   console.log(key, "=>", value);
+            // }
             // return;
             if (
               imagePreviews.some((img) => img.file) ||
@@ -519,7 +524,7 @@ const ProductSettingForm = () => {
                     onError: (uploadErr) => reject(uploadErr),
                   });
                 });
-                console.log({ res });
+                // console.log({ res });
                 if (res?.data && Array.isArray(res.data)) {
                   router.replace("/dashboard/products");
                 } else {
