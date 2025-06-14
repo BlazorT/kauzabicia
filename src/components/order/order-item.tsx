@@ -12,9 +12,8 @@ import { getOrderDelayColor } from "@/utils/orderUtils";
 import { MenuItem, ORDER, OrderProduct } from "@/utils/types";
 import { Loader2 } from "lucide-react";
 import moment from "moment";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -70,8 +69,6 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   );
   const showElapsedTimer =
     timeRemaining > 0 && orderStatus === "Active" && order.saleTypeId === 3;
-
-  const [storeImgErr, setStoreImgErr] = useState(false);
 
   const onRepeatOrder = () => {
     if (!storeData?.isStoreOpen) {
@@ -201,7 +198,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
       <CardContent className={`p-2 relative rounded-lg`}>
         {order?.paymentStatusId === 1 && (
           <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-            <div className="text-4xl font-bold text-green-500 opacity-20 rotate-[-20deg] select-none">
+            <div className="text-5xl font-bold text-green-500 opacity-20 rotate-[-20deg] select-none">
               PAID
             </div>
           </div>
@@ -211,7 +208,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
           className="flex flex-row gap-4 items-start"
           onClick={toOrderDetails}
         >
-          {/* Store Image */}
+          {/* Store Image
           <div className="w-15 md:w-28 flex justify-center">
             <Image
               src={storeImgErr ? "/no-image.png" : API_URL + order.url}
@@ -221,7 +218,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
               className="object-cover rounded-md self-start"
               onError={() => setStoreImgErr(true)}
             />
-          </div>
+          </div> */}
 
           {/* Order Details */}
           <div className="flex flex-col flex-1 space-y-2">
@@ -286,7 +283,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
             )}
           </div>
         </div>
-        <div className="w-auto flex justify-end items-center gap-2 flex-wrap mt-1 md:mt-0">
+        <div className="w-auto flex  md:absolute right-2 bottom-2 justify-end items-center gap-2 flex-wrap mt-1 md:mt-0">
           <ManageOrder order_products={order_products} order={order} />
           {user?.roleId !== USER_ROLE?.USER &&
             order?.status !== 5 &&

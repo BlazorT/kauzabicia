@@ -101,7 +101,13 @@ const HeaderProfile = () => {
         {/* <DropdownMenuSeparator /> */}
         <DropdownMenuItem
           className="gap-3"
-          onClick={() => route.push("/account")}
+          onClick={() => {
+            if (user?.roleId !== USER_ROLE.USER) {
+              route.push("/dashboard/account");
+            } else {
+              route.push("/account");
+            }
+          }}
         >
           {userAvatar && !isProfileImgError ? (
             <div className="w-6 h-6 rounded-full overflow-hidden relative">
@@ -119,7 +125,13 @@ const HeaderProfile = () => {
         </DropdownMenuItem>
         <DropdownMenuItem
           className="gap-3"
-          onClick={() => route.push("/orders")}
+          onClick={() => {
+            if (user?.roleId !== USER_ROLE.USER) {
+              route.push("/dashboard/orders");
+            } else {
+              route.push("/orders");
+            }
+          }}
         >
           <ScrollText className="size-6 shrink-0" />
           <p className="text-base">Orders</p>
