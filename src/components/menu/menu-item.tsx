@@ -1,28 +1,27 @@
 // src/components/menu/MenuItem/index.tsx
-import { MenuItem as MenuItemType } from "@/utils/types";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Dialog } from "../ui/dialog";
-import { MenuItemControls } from "./menu-item-controlls";
-import { MenuItemDescription } from "./menu-item-description";
-import MenuItemDetail from "./menu-item-detail";
-import { MenuItemHeader } from "./menu-item-header";
-import { MenuItemImage } from "./menu-item-image";
-import { MenuItemPricing } from "./menu-item-pricing";
-import { MenuItemTags } from "./menu-item-tags";
 import { useCart } from "@/context/cart-context";
 import { getImageUrlsFromVariation, getOptions } from "@/utils/menuUtils";
-import MenuItemFavorite from "./menu-item-fav";
-import { Card, CardContent } from "../ui/card";
+import { MenuItem as MenuItemType } from "@/utils/types";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Lightbox from "yet-another-react-lightbox";
-import Captions from "yet-another-react-lightbox/plugins/captions";
 import "yet-another-react-lightbox/plugins/captions.css";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import { Card, CardContent } from "../ui/card";
+import { Dialog } from "../ui/dialog";
+import { MenuItemControls } from "./menu-item-controlls";
+import { MenuItemDescription } from "./menu-item-description";
+import MenuItemDetail from "./menu-item-detail";
+import MenuItemFavorite from "./menu-item-fav";
+import { MenuItemHeader } from "./menu-item-header";
+import { MenuItemImage } from "./menu-item-image";
+import { MenuItemPricing } from "./menu-item-pricing";
+import { MenuItemTags } from "./menu-item-tags";
 
 interface MenuItemProps {
   item: MenuItemType;
