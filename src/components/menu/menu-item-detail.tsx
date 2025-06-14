@@ -47,9 +47,9 @@ const MenuItemDetail: React.FC<MenuItemDetailProps> = ({
   return (
     <DialogContent
       aria-describedby="menu-detail"
-      aria-description="menu-detial"
+      aria-description="menu-detail"
       title="menu-detail"
-      className="max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[70%] p-0 max-h-[90vh] gap-1 overflow-y-auto"
+      className="max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[70%] p-0 max-h-[90vh] flex flex-col"
     >
       <DialogTitle className="hidden"></DialogTitle>
       <div className="flex flex-col md:flex-row gap-4 p-4 overflow-hidden">

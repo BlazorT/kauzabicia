@@ -132,7 +132,7 @@ const MenuDetailControls: React.FC<MenuDetailControlsProps> = ({
     }
   };
   return (
-    <div className="sticky bottom-0 flex items-center gap-2 bg-background z-50">
+    <div className="sticky bottom-[-10] md:static md:bottom-auto flex items-center gap-2 z-50 p-0 bg-card">
       {quantity > 0 && (
         <div className="flex flex-3/12 justify-around items-center gap-4 border-secondary border-2 p-2 rounded-xl hover:shadow-sm hover:shadow-muted-foreground/10 bg-background">
           {quantity === 1 ? (
