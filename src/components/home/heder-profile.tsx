@@ -11,6 +11,7 @@ import {
   LogOut,
   PackageSearch,
   ScrollText,
+  ShoppingBasket,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -143,6 +144,15 @@ const HeaderProfile = () => {
           >
             <LayoutDashboard className="size-6 shrink-0" />
             <p className="text-base">Dashboard</p>
+          </DropdownMenuItem>
+        )}
+        {user?.roleId !== USER_ROLE.USER && (
+          <DropdownMenuItem
+            className="gap-3"
+            onClick={() => route.push("/dashboard/products")}
+          >
+            <ShoppingBasket className="size-6 shrink-0" />
+            <p className="text-base">Products</p>
           </DropdownMenuItem>
         )}
         {user?.roleId !== USER_ROLE.USER && (

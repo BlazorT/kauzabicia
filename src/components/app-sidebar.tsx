@@ -4,7 +4,7 @@ import {
   BookOpen,
   Bot,
   GalleryVerticalEnd,
-  HandPlatter,
+  PackageSearch,
   ScrollText,
   Settings2,
   ShoppingBasket,
@@ -145,12 +145,12 @@ const data = {
     {
       name: "Products",
       url: "/dashboard/products",
-      icon: HandPlatter,
+      icon: ShoppingBasket,
     },
     {
       name: "Product Settings",
       url: "/dashboard/product-setting",
-      icon: ShoppingBasket,
+      icon: PackageSearch,
     },
     {
       name: "Orders",
