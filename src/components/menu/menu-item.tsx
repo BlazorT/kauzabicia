@@ -122,7 +122,7 @@ export const MenuItem = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item, showProductId]);
 
-  // console.log({ item: item.menuJSON, id: item.productname });
+  // console.log({ item: item.productDetailId, id: item.productname });
 
   return (
     <>

@@ -24,53 +24,57 @@ import {
 import { Input } from "../ui/input";
 import PasswordStrengthIndicator from "./password_strength";
 
-const formSchema = z
-  .object({
-    avatar: z.any().optional(),
-    firstname: z
-      .string()
-      .min(2, "First name must be at least 2 characters")
-      .max(50, "First name cannot exceed 50 characters")
-      .nonempty("First name is required"),
-    lastname: z
-      .string()
-      .min(2, "Last name must be at least 2 characters")
-      .max(50, "Last name cannot exceed 50 characters")
-      .nonempty("Last name is required"),
-    email: z
-      .string()
-      .email("Invalid email address")
-      .max(100, "Email cannot exceed 100 characters")
-      .nonempty("Email is required"),
-    // contact: z
-    //   .string()
-    //   .min(10, "Contact number must be at least 10 digits")
-    //   .max(15, "Contact number cannot exceed 15 digits")
-    //   .regex(
-    //     /^[0-9+\-\s()]*$/,
-    //     "Contact number can only contain numbers, +, -, (), and spaces"
-    //   )
-    //   .nonempty("Contact number is required"),
-    password: z
-      .string()
-      .min(6, "Password must be at least 6 characters")
-      .max(50, "Password cannot exceed 50 characters")
-      .regex(
-        /^(?=.*[A-Z])(?=.*\d)(?=.*[@]).{6,}$/,
-        "Password must include at least one uppercase letter, one number, and the @ symbol"
-      )
-      .nonempty("Password is required"),
-    confirm_password: z.string().nonempty("Please confirm your password"),
-    // address: z
-    //   .string()
-    //   .min(5, "Address must be at least 5 characters")
-    //   .max(200, "Address cannot exceed 200 characters")
-    //   .nonempty("Address is required"),
-  })
-  .refine((data) => data.password === data.confirm_password, {
-    message: "Passwords don't match",
-    path: ["confirm_password"],
-  });
+const formSchema = z.object({
+  avatar: z.any().optional(),
+  firstname: z
+    .string()
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name cannot exceed 50 characters")
+    .nonempty("First name is required"),
+  lastname: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name cannot exceed 50 characters")
+    .nonempty("Last name is required"),
+  contact: z
+    .string()
+    .min(10, "Contact must be at least 10 characters")
+    .max(15, "Contact cannot exceed 15 characters")
+    .nonempty("Contact is required"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .max(100, "Email cannot exceed 100 characters")
+    .nonempty("Email is required"),
+  // contact: z
+  //   .string()
+  //   .min(10, "Contact number must be at least 10 digits")
+  //   .max(15, "Contact number cannot exceed 15 digits")
+  //   .regex(
+  //     /^[0-9+\-\s()]*$/,
+  //     "Contact number can only contain numbers, +, -, (), and spaces"
+  //   )
+  //   .nonempty("Contact number is required"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .max(50, "Password cannot exceed 50 characters")
+    .regex(
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@]).{6,}$/,
+      "Password must include at least one uppercase letter, one number, and the @ symbol"
+    )
+    .nonempty("Password is required"),
+  // confirm_password: z.string().nonempty("Please confirm your password"),
+  // address: z
+  //   .string()
+  //   .min(5, "Address must be at least 5 characters")
+  //   .max(200, "Address cannot exceed 200 characters")
+  //   .nonempty("Address is required"),
+});
+// .refine((data) => data.password === data.confirm_password, {
+//   message: "Passwords don't match",
+//   path: ["confirm_password"],
+// });
 
 const SignUpForm = () => {
   const { showAlert } = useAlert();
@@ -79,7 +83,7 @@ const SignUpForm = () => {
   const { mutate: uploadImage, isPending: isPendingImageUpload } =
     useUploadImage();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,7 +95,8 @@ const SignUpForm = () => {
       lastname: "",
       email: "",
       password: "",
-      confirm_password: "",
+      contact: "",
+      // confirm_password: "",
     },
   });
   const password = form.watch("password");
@@ -155,7 +160,7 @@ const SignUpForm = () => {
         firstName: values.firstname,
         lastName: values.lastname,
         email: values.email,
-        primaryContact: "",
+        primaryContact: values?.contact,
         address: "",
         password: btoa(values.password),
         genderId: 1,
@@ -322,6 +327,19 @@ const SignUpForm = () => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="contact"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Contact</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Contact number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* <FormField
           control={form.control}
@@ -369,7 +387,7 @@ const SignUpForm = () => {
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="confirm_password"
           render={({ field }) => (
@@ -399,7 +417,7 @@ const SignUpForm = () => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         <PasswordStrengthIndicator password={password} />
         {/* <FormField

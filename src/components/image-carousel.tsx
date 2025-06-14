@@ -64,7 +64,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               src={imageUrls[selectedImage]}
               alt={item.productname}
               fill
-              className="object-cover cursor-zoom-in"
+              className="object-fill cursor-zoom-in"
             />
             {isHovering && (
               <div

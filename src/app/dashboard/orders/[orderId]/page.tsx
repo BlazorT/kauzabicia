@@ -8,12 +8,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import Spinner from "@/components/ui/spinner";
 import { useLOV } from "@/context/lov-context";
 import { useFetchOrderDetails } from "@/hooks/useOrder";
-import { API_URL } from "@/services/apiClient";
 import { OrderProduct } from "@/utils/types";
 import moment from "moment";
-import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 const OrderDetail = () => {
   const params = useParams();
@@ -57,8 +55,6 @@ const OrderDetail = () => {
     [orderDetailRes]
   ) as OrderProduct[];
 
-  const [storeImgErr, setStoreImgErr] = useState(false);
-
   const order = (order_products[0] ?? null) as OrderProduct | null;
 
   const orderStatus = useMemo(
@@ -95,7 +91,7 @@ const OrderDetail = () => {
         <Card className="p-0">
           <CardContent className="p-2 ">
             <div className="grid grid-cols-6 gap-2 items-start">
-              <div className="col-span-1 place-content-center place-items-center">
+              {/* <div className="col-span-1 place-content-center place-items-center">
                 <Image
                   src={storeImgErr ? "/no-image.png" : API_URL + order.logoPath}
                   alt="store"
@@ -104,7 +100,7 @@ const OrderDetail = () => {
                   className="object-cover rounded-md shrink-0"
                   onError={() => setStoreImgErr(true)}
                 />
-              </div>
+              </div> */}
               <div className="col-span-5 space-y-3">
                 <p className="text-lg font-bold">
                   {order.tradeName} - {order.storeAddress}

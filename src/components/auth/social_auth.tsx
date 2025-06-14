@@ -9,14 +9,12 @@ import { SIGN_UP_FORM, User } from "@/utils/types";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import moment from "moment";
-import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
 
 const SocialAuth = () => {
-  const { status } = useSession();
   // console.log({ data });
   const { login } = useAuth();
   const { showAlert } = useAlert();
@@ -154,7 +152,7 @@ const SocialAuth = () => {
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {(status === "loading" || isPending) && <Spinner />}
+      {isPending && <Spinner />}
       <Button variant="outline" className="w-full">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path
