@@ -10,6 +10,7 @@ import {
   useMenu,
 } from "@/hooks/useMenu";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/services/apiClient";
 import { QUERY_KEYS } from "@/utils/queryKeys";
 import { MenuItem, RESPONSE } from "@/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,6 +58,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import RichTextEditor from "../ui/rich-text-editor";
 import Spinner from "../ui/spinner";
+
 interface ProductUnit {
   createdAt: string;
   createdBy: number;
@@ -69,6 +71,13 @@ interface ProductUnit {
   shortCode: string;
   status: number;
 }
+
+interface MenuImage {
+  Id: number;
+  ContentRefId: string;
+  FileName: string;
+}
+
 // Zod schema for the new product form
 const formSchema = z.object({
   productId: z
@@ -117,8 +126,8 @@ const formSchema = z.object({
   images: z
     .array(
       z.object({
-        file: z.any(), // File object for upload
-        preview: z.string(), // Base64 string for preview
+        file: z.any().nullable(), // Allow null for existing images
+        preview: z.string(),
       })
     )
     .max(20, "You can upload a maximum of 20 images")
@@ -126,9 +135,11 @@ const formSchema = z.object({
       (files) =>
         files.every(
           (file) =>
-            file.file.type.startsWith("image/") &&
-            file.file.size <= 5 * 1024 * 1024
-        ), // 5MB limit
+            // Only validate file type and size for new files (non-null)
+            !file.file ||
+            (file.file.type.startsWith("image/") &&
+              file.file.size <= 5 * 1024 * 1024)
+        ),
       `Each image must be a valid image type and less than 5MB`
     )
     .refine(
@@ -170,6 +181,7 @@ const ProductSettingForm = () => {
     productDetailId ?? ""
   );
   const updating_product = (menuResponse?.data as MenuItem[])?.[0] ?? null;
+  console.log({ productDetailId });
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: uploadImage, isPending: isPendingImageUpload } =
@@ -186,8 +198,20 @@ const ProductSettingForm = () => {
   const units = (unitsData?.data ?? []) as ProductUnit[] | [];
 
   const [imagePreviews, setImagePreviews] = useState<
-    { file: File; preview: string }[]
+    {
+      file: File | null;
+      preview: string;
+      id?: number;
+      status?: number;
+      ContentRefId?: string;
+    }[]
   >([]);
+  const [deletedImages, setDeletedImages] = useState<
+    { id: number; ContentRefId: string; preview: string; file: File }[]
+  >([]);
+  const [replacingImageIndex, setReplacingImageIndex] = useState<number | null>(
+    null
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -225,6 +249,27 @@ const ProductSettingForm = () => {
     form.setValue("code", updating_product?.barcode);
   }, [updating_product, form, productDetailId]);
 
+  useEffect(() => {
+    if (updating_product && productDetailId && updating_product.menuJSON) {
+      try {
+        const jsonArray = JSON.parse(updating_product.menuJSON) as MenuImage[];
+        const existingImages = jsonArray.map((item) => ({
+          file: null,
+          preview: `${API_URL}/${item.FileName.replace(
+            /^wwwroot[\\/]+/,
+            ""
+          ).replace(/\\/g, "/")}`,
+          id: item.Id,
+          status: 1, // 1 for active
+          ContentRefId: item.ContentRefId,
+        }));
+        setImagePreviews(existingImages);
+      } catch (err) {
+        console.error("Error parsing menuJSON:", err);
+      }
+    }
+  }, [updating_product, productDetailId]);
+
   const unitPrice = form.watch("unitPrice");
   // const discount = form.watch("discount");
   // const discountPercent = form.watch("discountPercent");
@@ -234,7 +279,13 @@ const ProductSettingForm = () => {
 
     if (files.length === 0) return;
 
-    const newImagePreviews: { file: File; preview: string }[] = [];
+    const newImagePreviews: {
+      file: File;
+      preview: string;
+      id?: number;
+      status?: number;
+      ContentRefId?: string;
+    }[] = [];
     const imagePromises: Promise<void>[] = [];
 
     files.forEach((file) => {
@@ -259,7 +310,20 @@ const ProductSettingForm = () => {
               img.height >= IMAGE_MIN &&
               img.height <= IMAGE_MAX
             ) {
-              newImagePreviews.push({ file, preview });
+              // If we're replacing an image
+              if (replacingImageIndex !== null && replacingImageIndex >= 0) {
+                const existingImage = imagePreviews[replacingImageIndex];
+                newImagePreviews.push({
+                  file,
+                  preview,
+                  id: existingImage.id,
+                  ContentRefId: existingImage.ContentRefId,
+                  status: 1,
+                });
+              } else {
+                // New image
+                newImagePreviews.push({ file, preview, status: 1 });
+              }
             } else {
               toast.error(
                 `Image "${file.name}" dimensions must be between 400x400 and 1300x1300 pixels.`
@@ -278,20 +342,65 @@ const ProductSettingForm = () => {
     });
 
     Promise.all(imagePromises).then(() => {
-      const updatedImages = [...imagePreviews, ...newImagePreviews].slice(
-        0,
-        20
-      ); // Limit to 5 images
+      let updatedImages;
+      if (replacingImageIndex !== null) {
+        // Replace the image at the specified index
+        updatedImages = [...imagePreviews];
+        updatedImages[replacingImageIndex] = newImagePreviews[0];
+      } else {
+        // Add new images
+        updatedImages = [...imagePreviews, ...newImagePreviews].slice(0, 20);
+      }
+
       setImagePreviews(updatedImages);
+      setReplacingImageIndex(null); // Reset replacing state
       form.setValue(
         "images",
         updatedImages.map((img) => ({ file: img.file, preview: img.preview }))
       );
-      form.clearErrors("images"); // Clear image errors after new selection
+      form.clearErrors("images");
     });
   };
 
-  const removeImage = (index: number) => {
+  const handleReplaceClick = (index: number) => {
+    setReplacingImageIndex(index);
+    fileInputRef.current?.click();
+  };
+
+  const removeImage = async (index: number) => {
+    const imageToRemove = imagePreviews[index];
+
+    // If it's an existing image (has id), add it to deletedImages
+    if (imageToRemove.id && imageToRemove.ContentRefId) {
+      const response = await fetch(
+        `/api/image-proxy?url=${encodeURIComponent(imageToRemove.preview)}`
+      );
+      const blob = await response.blob();
+
+      // Try to guess the extension from blob type or URL
+      const extensionFromMime = blob.type.split("/").pop(); // e.g., "png"
+      const nameParts =
+        imageToRemove.preview.split("/").pop()?.split(".") || [];
+      const ext = nameParts.length > 1 ? nameParts.pop() : extensionFromMime;
+      const base = nameParts.join(".");
+      const newFileName = `${base}_${imageToRemove.id}_2.${ext}`;
+
+      const file = new File([blob], newFileName, {
+        type: blob.type,
+        lastModified: Date.now(),
+      });
+      setDeletedImages((prev) => [
+        ...prev,
+        {
+          id: imageToRemove.id as number,
+          ContentRefId: imageToRemove.ContentRefId as string,
+          file: file as File,
+          preview: imageToRemove.preview,
+        },
+      ]);
+    }
+
+    // Remove from UI
     const updatedImages = imagePreviews.filter((_, i) => i !== index);
     setImagePreviews(updatedImages);
     form.setValue(
@@ -299,7 +408,7 @@ const ProductSettingForm = () => {
       updatedImages.map((img) => ({ file: img.file, preview: img.preview }))
     );
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Clear the input field to allow re-uploading the same file
+      fileInputRef.current.value = "";
     }
   };
 
@@ -329,7 +438,6 @@ const ProductSettingForm = () => {
     };
 
     console.log("Submitting Product Data:", productData);
-    // console.log(JSON.stringify(productData));
 
     mutate(productData, {
       onSuccess: async (res) => {
@@ -340,27 +448,70 @@ const ProductSettingForm = () => {
           });
           toast.success(res?.message);
           const message = res?.message ?? "";
-          const regex = /#(\d+)/; // Matches '#' followed by one or more digits
+          const regex = /#(\d+)/;
           const match = message.match(regex);
 
-          let productId = "";
+          let productDetailId = "";
           if (match && match[1]) {
-            productId = match[1];
-            console.log(productId); // Output: "417"
+            productDetailId = match[1];
+            console.log(productDetailId);
           }
-          if (productId && values.images.length > 0) {
-            const uploadedImageUrls: string[] = [];
-            const formData = new FormData();
-            for (const image of values.images) {
-              formData.append("files", image.file);
 
-              // Await each image upload
+          // console.log({ imagePreviews, deletedImages });
+          if (
+            productDetailId &&
+            (imagePreviews?.length > 0 || deletedImages.length > 0)
+          ) {
+            const formData = new FormData();
+
+            // Process all images
+            for (const image of imagePreviews) {
+              if (image.file) {
+                let fileName = image.file.name;
+
+                // Modify the filename if ID is available
+                if (image.id) {
+                  const nameParts = fileName.split(".");
+                  const extension = nameParts.pop(); // get the extension
+                  const baseName = nameParts.join("."); // in case filename has dots
+                  fileName = `${baseName}_${image.id}_1.${extension}`;
+                }
+
+                // Append file with modified name
+                formData.append("files", image.file, fileName);
+              }
             }
-            formData.append("id", productId); // Append the room ID
-            formData.append("userid", user?.id?.toString() ?? "0"); // Append the user ID
-            formData.append("remarks", ""); // Append remarks
-            console.log(formData);
-            if (values.images.length > 0) {
+            for (const image of deletedImages) {
+              if (image.file) {
+                // Modify the filename if ID is available
+                if (image.id) {
+                  formData.append("files", image.file);
+                }
+
+                // Append file with modified name
+              }
+            }
+
+            // Add deleted image IDs
+            // if (deletedImages.length > 0) {
+            //   formData.append(
+            //     "deletedImageIds",
+            //     JSON.stringify(deletedImages.map((img) => img.id))
+            //   );
+            // }
+
+            formData.append("id", productDetailId);
+            formData.append("userid", user?.id?.toString() ?? "0");
+            formData.append("remarks", "");
+
+            for (const [key, value] of formData.entries()) {
+              console.log(key, "=>", value);
+            }
+            // return;
+            if (
+              imagePreviews.some((img) => img.file) ||
+              deletedImages.length > 0
+            ) {
               try {
                 const res: RESPONSE = await new Promise((resolve, reject) => {
                   uploadImage(formData, {
@@ -370,15 +521,8 @@ const ProductSettingForm = () => {
                 });
                 console.log({ res });
                 if (res?.data && Array.isArray(res.data)) {
-                  // If res.data is an array of URLs, iterate and process each one
-                  res.data.forEach((urlPath: string) => {
-                    // Clean the file path (replace backslashes, add leading slash)
-                    const cleanedFilePath = "/" + urlPath.replace(/\\/g, "/"); // Replace backslashes with forward slashes
-                    uploadedImageUrls.push(cleanedFilePath);
-                  });
                   router.replace("/dashboard/products");
                 } else {
-                  // If res.data is not an array or is missing, log an error and stop
                   toast.error(
                     "Failed to get image URLs from upload response: Data format is incorrect."
                   );
@@ -387,10 +531,10 @@ const ProductSettingForm = () => {
               } catch (err) {
                 console.error("Image upload error:", err);
                 toast.error("Failed to upload image.");
-                return; // Stop submission if an image upload fails
+                return;
               }
             }
-            toast.success("Product form submitted! (Check console for data)");
+            toast.success("Product form submitted!");
           } else {
             router.replace("/dashboard/products");
           }
@@ -798,7 +942,7 @@ const ProductSettingForm = () => {
         </div>
         {/* Image Upload */}
         <FormItem>
-          <FormLabel>Product Images (Min 5)</FormLabel>
+          <FormLabel>Product Image(s)</FormLabel>
           <FormControl>
             <div className="flex flex-col gap-2">
               <input
@@ -806,18 +950,21 @@ const ProductSettingForm = () => {
                 ref={fileInputRef}
                 onChange={handleImageChange}
                 accept="image/*"
-                multiple
+                multiple={replacingImageIndex === null}
                 className="hidden"
                 id="product-image-upload"
               />
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => {
+                  setReplacingImageIndex(null);
+                  fileInputRef.current?.click();
+                }}
                 className="flex items-center gap-2"
                 disabled={imagePreviews.length >= 20 || isPendingImageUpload}
               >
-                <Upload className="h-4 w-4" /> Upload Images
+                <Upload className="h-4 w-4" /> Upload Attachment
               </Button>
               <p className="text-xs text-muted-foreground">
                 Max file size: 5MB per image. Dimensions: 400x400 to 1300x1300
@@ -829,21 +976,33 @@ const ProductSettingForm = () => {
             {imagePreviews.map((img, index) => (
               <div
                 key={index}
-                className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200"
+                className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group"
               >
                 <Image
                   src={img.preview}
                   alt={`Product Image ${index + 1}`}
                   fill
                   className="object-cover"
+                  sizes="96px"
                 />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full hover:bg-destructive/90 transition-colors shadow-sm z-10"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => handleReplaceClick(index)}
+                    className="bg-white/90 text-primary p-2 rounded-full hover:bg-white transition-colors shadow-sm"
+                  >
+                    <Upload className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="absolute top-1 right-1 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="bg-destructive text-destructive-foreground p-1 rounded-full hover:bg-destructive/90 transition-colors shadow-sm z-10"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

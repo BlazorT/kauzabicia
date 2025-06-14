@@ -24,7 +24,7 @@ export const configService = {
     return response.data;
   },
   getIpInfo: async (): Promise<RESPONSE> => {
-    const response = await axios.get("http://www.geoplugin.net/json.gp");
+    const response = await axios.get("/api/get-ip-info");
     return response.data;
   },
 };

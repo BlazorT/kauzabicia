@@ -110,6 +110,7 @@ const StoreItem: React.FC<StoreItemProps> = ({ store }) => {
           fill // Image will fill this div
           className="object-fill transition-transform duration-300 group-hover:scale-105" // Cover and scale on hover
           onError={() => setDealPicErr(true)}
+          // sizes="96px"
         />
       </div>
       <div

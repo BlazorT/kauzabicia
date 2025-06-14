@@ -19,8 +19,8 @@ export const useMenu = (
         status,
       }),
     enabled: Boolean(storeId),
-    staleTime: 1 * 60 * 1000, // 5 minutes: data is fresh for this duration
-    refetchInterval: 1 * 60 * 1000, // refetch every 5 minutes
+    staleTime: 1 * (productDetailId ? 10 : 60) * 1000, // 5 minutes: data is fresh for this duration
+    refetchInterval: 1 * (productDetailId ? 10 : 60) * 1000, // refetch every 5 minutes
     refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
   });
 };

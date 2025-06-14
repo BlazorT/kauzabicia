@@ -83,6 +83,8 @@ const SignInForm = () => {
       } else {
         userData = res.data;
       }
+      console.log(userData);
+
       if (userData?.isVerified === 1) {
         login(userData);
         toast.success(

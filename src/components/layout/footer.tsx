@@ -60,7 +60,7 @@ export default function Footer() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   className="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"
@@ -83,6 +83,8 @@ export default function Footer() {
               <li>
                 <Link
                   href="/about"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   About Us
@@ -91,6 +93,8 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Contact
@@ -99,6 +103,8 @@ export default function Footer() {
               <li>
                 <Link
                   href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Privacy Policy
@@ -132,6 +138,8 @@ export default function Footer() {
               <li>
                 <Link
                   href="/faq"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   FAQ

@@ -4,7 +4,15 @@ import { useAlert } from "@/context/alert-context";
 import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { googleLogout } from "@react-oauth/google";
-import { ChevronDown, ChevronUp, LogOut, ScrollText, User } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  LayoutDashboard,
+  LogOut,
+  PackageSearch,
+  ScrollText,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -18,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { formatAvatar } from "@/lib/utils";
 import Image from "next/image";
 import { useOrder } from "@/context/order-context";
+import { USER_ROLE } from "@/constants/constants";
 
 const HeaderProfile = () => {
   const { user, logout } = useAuth();
@@ -115,6 +124,25 @@ const HeaderProfile = () => {
           <ScrollText className="size-6 shrink-0" />
           <p className="text-base">Orders</p>
         </DropdownMenuItem>
+        {user?.roleId !== USER_ROLE.USER && (
+          <DropdownMenuItem
+            className="gap-3"
+            onClick={() => route.push("/dashboard")}
+          >
+            <LayoutDashboard className="size-6 shrink-0" />
+            <p className="text-base">Dashboard</p>
+          </DropdownMenuItem>
+        )}
+        {user?.roleId !== USER_ROLE.USER && (
+          <DropdownMenuItem
+            className="gap-3"
+            onClick={() => route.push("/dashboard/product-setting")}
+          >
+            <PackageSearch className="size-6 shrink-0" />
+            <p className="text-base">Product Setting</p>
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem className="gap-3" onClick={handleLogOut}>
           <LogOut className="size-6 shrink-0" />
           <p className="text-base">Sign Out</p>
