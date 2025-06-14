@@ -10,7 +10,7 @@ export const useMenu = (
   status: string = "1"
 ) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.MENU, storeId, productDetailId ?? "0"],
+    queryKey: [QUERY_KEYS.MENU, storeId, productDetailId ?? "0", status],
     queryFn: () =>
       menuService.getMenu({
         storeId,

@@ -60,7 +60,10 @@ const ProductAction = (props: Props) => {
         // console.log({ res });
         if (res?.status == true) {
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.MENU, "1", "0"],
+            queryKey: [QUERY_KEYS.MENU, "1", "0", "0"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.MENU, "1", "0", "1"],
           });
           toast.success(res?.message);
         } else {

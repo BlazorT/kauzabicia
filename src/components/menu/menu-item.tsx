@@ -67,6 +67,7 @@ export const MenuItem = ({
   const DOUBLE_CLICK_DELAY = 250; // ms
 
   const handleClick = () => {
+    if (!isStoreOpen) return;
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTime.current;
 
