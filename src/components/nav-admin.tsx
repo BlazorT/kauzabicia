@@ -1,6 +1,7 @@
 "use client";
 
 import { type LucideIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import {
   SidebarGroup,
@@ -21,7 +22,7 @@ export function NavAdmin({
     icon: LucideIcon;
   }[];
 }) {
-  // const { isMobile } = useSidebar();
+  const pathname = usePathname();
 
   return (
     <SidebarGroup className="">
@@ -29,7 +30,7 @@ export function NavAdmin({
       <SidebarMenu>
         {projects.map((item, index) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={pathname === item.url}>
               <Link href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
