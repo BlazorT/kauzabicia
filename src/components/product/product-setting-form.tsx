@@ -452,15 +452,9 @@ const ProductSettingForm = () => {
             queryKey: [QUERY_KEYS.MENU, "1", "0"],
           });
           toast.success(res?.message);
-          const message = res?.message ?? "";
-          const regex = /#(\d+)/;
-          const match = message.match(regex);
 
-          let productDetailId = "";
-          if (match && match[1]) {
-            productDetailId = match[1];
-            console.log(productDetailId);
-          }
+          const productDetailId: string | number =
+            (res?.data as { id?: number })?.id ?? 0;
 
           // console.log({ imagePreviews, deletedImages });
           if (
@@ -505,7 +499,7 @@ const ProductSettingForm = () => {
             //   );
             // }
 
-            formData.append("id", productDetailId);
+            formData.append("id", productDetailId?.toString());
             formData.append("userid", user?.id?.toString() ?? "0");
             formData.append("remarks", "");
 
@@ -540,6 +534,7 @@ const ProductSettingForm = () => {
               }
             }
             toast.success("Product form submitted!");
+            router.replace("/dashboard/products");
           } else {
             router.replace("/dashboard/products");
           }
@@ -569,6 +564,7 @@ const ProductSettingForm = () => {
         {/* Product ID and Unit ID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="productId"
             render={({ field }) => (
@@ -580,6 +576,11 @@ const ProductSettingForm = () => {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            disabled={
+                              isPending ||
+                              isPendingImageUpload ||
+                              isPendingAddUpdate
+                            }
                             variant="outline"
                             role="combobox"
                             className={cn(
@@ -645,6 +646,7 @@ const ProductSettingForm = () => {
             )}
           />
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="unitId"
             render={({ field }) => (
@@ -656,6 +658,11 @@ const ProductSettingForm = () => {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            disabled={
+                              isPending ||
+                              isPendingImageUpload ||
+                              isPendingAddUpdate
+                            }
                             variant="outline"
                             role="combobox"
                             className={cn(
@@ -721,6 +728,7 @@ const ProductSettingForm = () => {
         {/* Pricing and Discount */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="code"
             render={({ field }) => (
@@ -730,6 +738,8 @@ const ProductSettingForm = () => {
                   <div className="relative">
                     <Code className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
+                      // disabled={true}
+
                       placeholder="Product Code"
                       {...field}
                       onChange={(e) => {
@@ -744,6 +754,7 @@ const ProductSettingForm = () => {
             )}
           />
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="unitPrice"
             render={({ field }) => (
@@ -769,6 +780,7 @@ const ProductSettingForm = () => {
             )}
           />
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="taxPercent"
             render={({ field }) => (
@@ -797,6 +809,7 @@ const ProductSettingForm = () => {
         {/* Tax, Ready Time, Status */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="discount"
             render={({ field }) => (
@@ -834,6 +847,7 @@ const ProductSettingForm = () => {
             )}
           />
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="discountPercent"
             render={({ field }) => (
@@ -871,6 +885,7 @@ const ProductSettingForm = () => {
             )}
           />
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="readyTime"
             render={({ field }) => (
@@ -895,6 +910,7 @@ const ProductSettingForm = () => {
         </div>
         {/* Description */}
         <FormField
+          disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
           control={form.control}
           name="description"
           render={({ field }) => (
@@ -913,10 +929,11 @@ const ProductSettingForm = () => {
         />
         <div className="flex justify-center items-center">
           <FormField
+            disabled={isPending || isPendingImageUpload || isPendingAddUpdate}
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex gap-4">
                 <FormLabel>Status</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -958,6 +975,9 @@ const ProductSettingForm = () => {
                 multiple={replacingImageIndex === null}
                 className="hidden"
                 id="product-image-upload"
+                disabled={
+                  isPending || isPendingImageUpload || isPendingAddUpdate
+                }
               />
               <Button
                 type="button"
@@ -993,6 +1013,9 @@ const ProductSettingForm = () => {
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <button
                     type="button"
+                    disabled={
+                      isPending || isPendingImageUpload || isPendingAddUpdate
+                    }
                     onClick={() => handleReplaceClick(index)}
                     className="bg-white/90 text-primary p-2 rounded-full hover:bg-white transition-colors shadow-sm"
                   >
@@ -1003,6 +1026,9 @@ const ProductSettingForm = () => {
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
+                    disabled={
+                      isPending || isPendingImageUpload || isPendingAddUpdate
+                    }
                     className="bg-destructive text-destructive-foreground p-1 rounded-full hover:bg-destructive/90 transition-colors shadow-sm z-10"
                   >
                     <X className="h-3.5 w-3.5" />
