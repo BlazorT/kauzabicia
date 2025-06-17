@@ -36,7 +36,7 @@ export default function VerifyPage() {
     const email = searchParams.get("email");
     const id = searchParams.get("id");
     if (!email && !id) {
-      router.push("/");
+      router.push("/auth/signin");
     }
   }, [router, searchParams]);
 
