@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAuth } from "@/context/auth-context";
 import { useFetchOrders } from "@/hooks/useOrder";
-import { ORDER } from "@/utils/types";
 import { SearchX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -22,7 +21,8 @@ const Orders: React.FC = () => {
   } = useFetchOrders((user?.id ?? 0).toString());
   // console.log({ ordersRes });
   const filteredOrders = useMemo(() => {
-    const allOrders: ORDER[] = (ordersRes?.data as ORDER[]) ?? [];
+    if (!ordersRes?.data) return [];
+    const allOrders = ordersRes?.data ?? [];
 
     return allOrders
       .filter((order) => ![2, 6, 4].includes(order.status))

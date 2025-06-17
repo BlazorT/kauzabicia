@@ -9,7 +9,7 @@ import { useFetchOrderDetails } from "@/hooks/useOrder";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
 import { API_URL } from "@/services/apiClient";
 import { getOrderDelayColor } from "@/utils/orderUtils";
-import { MenuItem, ORDER, OrderProduct } from "@/utils/types";
+import { MenuItem, ORDER } from "@/utils/types";
 import { Loader2 } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -39,9 +39,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
     order?.storeid?.toString(),
     moment().format("YYYY-MM-DDTHH:mm:ss")
   );
-  const menuData = useMemo(() => menuResponse?.data ?? [], [menuResponse]) as
-    | MenuItem[]
-    | [];
+  const menuData = useMemo(() => menuResponse?.data ?? [], [menuResponse]);
 
   const orderStatus = useMemo(
     () => lovs?.statuses?.find((s) => s.id === order?.status)?.name,
@@ -56,7 +54,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, isActiveOrder }) => {
   const order_products = useMemo(
     () => orderDetailRes?.data ?? [],
     [orderDetailRes]
-  ) as OrderProduct[];
+  );
 
   const { color: delayColor, label: delayLabel } = getOrderDelayColor(
     order.requireTime,

@@ -85,11 +85,11 @@ export function ChartAreaInteractive() {
   const chartConfig = {
     today: {
       label: `Today (${processedData.totalToday})`,
-      color: "var(--primary)",
+      color: "oklch(0.7118 0.1899 246.22 / 0.5);",
     },
     yesterday: {
       label: `Yesterday (${processedData.totalYesterday})`,
-      color: "var(--muted-foreground)",
+      color: "oklch(0.3588 0.0691 229.76)",
     },
   } satisfies ChartConfig;
 
@@ -172,13 +172,17 @@ export function ChartAreaInteractive() {
               fill="url(#fillYesterday)"
               stroke="var(--color-yesterday)"
               stackId="a"
+              strokeWidth={3}
+              fillOpacity={0.6}
             />
             <Area
               dataKey="today"
               type="bump"
               fill="url(#fillToday)"
               stroke="var(--color-today)"
-              stackId="a"
+              stackId="b"
+              strokeWidth={3}
+              fillOpacity={0.6}
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>

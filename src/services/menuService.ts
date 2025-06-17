@@ -1,6 +1,7 @@
 import {
   AddStoreProductToFavoriteParams,
   MENU_FORM,
+  MenuItem,
   RESPONSE,
   STORE_FILTERS_BODY,
 } from "@/utils/types";
@@ -8,7 +9,9 @@ import moment from "moment";
 import apiClient from "./apiClient";
 
 export const menuService = {
-  getMenu: async (menuBody: Partial<MENU_FORM>): Promise<RESPONSE> => {
+  getMenu: async (
+    menuBody: Partial<MENU_FORM>
+  ): Promise<RESPONSE<MenuItem[]>> => {
     // console.log({ menuBody });
     const response = await apiClient.post(
       "/api/blazorApi/storeproductsmenu",

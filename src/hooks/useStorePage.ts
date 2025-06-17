@@ -2,7 +2,6 @@
 import { USER_ROLE } from "@/constants/constants";
 import { useAuth } from "@/context/auth-context";
 import { useMenu } from "@/hooks/useMenu";
-import { MenuItem, OrderProduct } from "@/utils/types";
 import moment from "moment";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -91,22 +90,19 @@ export const useStorePage = (id?: string) => {
   const order_products = useMemo(
     () => orderDetailRes?.data ?? [],
     [orderDetailRes]
-  ) as OrderProduct[];
+  );
 
   const categorizedMenu = useMemo(() => {
     if (!menuResponse?.data || !Array.isArray(menuResponse.data)) return [];
-    // Type guard to ensure data is MenuItem[]
-    if (!menuResponse.data[0] || !("productId" in menuResponse.data[0]))
-      return [];
 
-    const categorized = organizeMenuByCategory(menuResponse.data as MenuItem[]);
+    const categorized = organizeMenuByCategory(menuResponse.data);
 
     return categorized;
   }, [menuResponse?.data]);
 
   const mostlyBoughtTogetherItems = useMemo(() => {
     if (!menuResponse?.data || !Array.isArray(menuResponse.data)) return [];
-    const items = menuResponse.data as MenuItem[];
+    const items = menuResponse.data;
     return items.filter((item) => item.mostlyBoughtTogether);
   }, [menuResponse?.data]);
 
@@ -213,7 +209,7 @@ export const useStorePage = (id?: string) => {
     scrollRight,
     scrollToCategory,
     mostlyBoughtTogetherItems,
-    menuData: menuData as MenuItem[],
+    menuData,
     order_products,
     saleId,
   };

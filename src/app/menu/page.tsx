@@ -3,7 +3,6 @@
 import CartSidebar from "@/components/cart/cart-sidebar";
 import { CategoryNav } from "@/components/category/category-nav";
 import ManagedOrder from "@/components/checkout/managed-order";
-import DealItem from "@/components/deal/deal-item";
 import { MenuItem } from "@/components/menu/menu-item";
 import { BookingInfo, CustomerInfo } from "@/components/order/order-detail";
 import { StoreHero } from "@/components/store/store-hero";
@@ -18,10 +17,7 @@ import { useOrder } from "@/context/order-context";
 import { useGetConfig } from "@/hooks/useInitialData";
 import { useStoreInfo } from "@/hooks/useStoreInfo";
 import { useStorePage } from "@/hooks/useStorePage";
-import {
-  DealItem as DealItemType,
-  MenuItem as MenuItemType,
-} from "@/utils/types";
+import { MenuItem as MenuItemType } from "@/utils/types";
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RefObject, useEffect, useMemo, useState } from "react";
@@ -65,27 +61,21 @@ export default function StorePage() {
     return categorizedMenu
       .map((category) => ({
         ...category,
-        items: (category.items as (MenuItemType | DealItemType)[]).filter(
-          (item) => {
-            if ("productname" in item) {
-              return (
-                item.productname
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()) ||
-                (item.description &&
-                  item.description
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()))
-              );
-            }
-            if ("dealCode" in item) {
-              return item.dealCode
+        items: (category.items as MenuItemType[]).filter((item) => {
+          if ("productname" in item) {
+            return (
+              item.productname
                 .toLowerCase()
-                .includes(searchQuery.toLowerCase());
-            }
-            return false;
+                .includes(searchQuery.toLowerCase()) ||
+              (item.description &&
+                item.description
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase()))
+            );
           }
-        ),
+
+          return false;
+        }),
       }))
       .filter((category) => category.items.length > 0);
   }, [categorizedMenu, searchQuery]);
@@ -410,23 +400,15 @@ export default function StorePage() {
               )}
 
               <div className="row-gap-4 gap-2 grid grid-cols-1 lg:grid-cols-2">
-                {category.items.map((item) =>
-                  category.name === "Deals" ? (
-                    <DealItem
-                      key={item?.id?.toString()}
-                      dealItem={item as DealItemType}
-                      isStoreOpen={isStoreOpen}
-                    />
-                  ) : (
-                    <MenuItem
-                      key={(item as MenuItemType).productDetailId}
-                      item={item as MenuItemType}
-                      mostlyBoughtTogetherItems={mostlyBoughtTogetherItems}
-                      isStoreOpen={isStoreOpen}
-                      showProductId={showProductId}
-                    />
-                  )
-                )}
+                {category.items.map((item) => (
+                  <MenuItem
+                    key={item.productDetailId}
+                    item={item}
+                    mostlyBoughtTogetherItems={mostlyBoughtTogetherItems}
+                    isStoreOpen={isStoreOpen}
+                    showProductId={showProductId}
+                  />
+                ))}
               </div>
             </section>
           ))}

@@ -6,6 +6,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { ModeToggle } from "./ui/theme-menu";
@@ -20,6 +21,7 @@ export function TeamSwitcher({
   }[];
 }) {
   const [activeTeam] = React.useState(teams[0]);
+  const { open } = useSidebar();
 
   if (!activeTeam) {
     return null;
@@ -39,9 +41,11 @@ export function TeamSwitcher({
               <span className="truncate text-xs">{activeTeam.plan}</span>
             </div>
           </SidebarMenuButton>
-          <div className="flex-shrink-0">
-            <ModeToggle />
-          </div>
+          {open && (
+            <div className="flex-shrink-0">
+              <ModeToggle />
+            </div>
+          )}
         </div>
       </SidebarMenuItem>
     </SidebarMenu>

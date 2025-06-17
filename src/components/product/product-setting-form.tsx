@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { API_URL } from "@/services/apiClient";
 import { QUERY_KEYS } from "@/utils/queryKeys";
-import { MenuItem, RESPONSE } from "@/utils/types";
+import { RESPONSE } from "@/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -180,7 +180,7 @@ const ProductSettingForm = () => {
     moment().format("YYYY-MM-DDTHH:mm:ss"),
     productDetailId ?? ""
   );
-  const updating_product = (menuResponse?.data as MenuItem[])?.[0] ?? null;
+  const updating_product = menuResponse?.data?.[0] ?? null;
   // console.log({ productDetailId, updating_product, menuResponse });
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -232,7 +232,7 @@ const ProductSettingForm = () => {
   });
 
   useEffect(() => {
-    if (!productDetailId) return;
+    if (!productDetailId || !updating_product) return;
     form.setValue("productId", updating_product?.productId?.toString());
     form.setValue("unitId", updating_product?.unitId?.toString());
     form.setValue(

@@ -1,6 +1,8 @@
 import {
   JazzCashInquiryResponse,
   JazzCashResponse,
+  ORDER,
+  OrderProduct,
   RESPONSE,
 } from "@/utils/types";
 import apiClient, { CONFIG_KEY, SOCKET_URL } from "./apiClient";
@@ -24,7 +26,7 @@ export const orderService = {
     return response.data;
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getOrders: async (body: any): Promise<RESPONSE> => {
+  getOrders: async (body: any): Promise<RESPONSE<ORDER[]>> => {
     const response = await apiClient.post(`/api/blazorApi/orders`, body);
     return response.data;
   },
@@ -36,7 +38,9 @@ export const orderService = {
     const response = await apiClient.post(`/api/blazorApi/stats`, body);
     return response.data;
   },
-  getOrderDetails: async (id: string | null): Promise<RESPONSE> => {
+  getOrderDetails: async (
+    id: string | null
+  ): Promise<RESPONSE<OrderProduct[]>> => {
     const response = await apiClient.post(`/api/blazorApi/orderdetails`, {
       id,
     });

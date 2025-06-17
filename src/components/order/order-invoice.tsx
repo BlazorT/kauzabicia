@@ -134,7 +134,7 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
                 </div>
               )}
 
-              <div className="border-t border-dashed border-gray-200 my-4" />
+              <div className="border-t border-dashed border-muted-foreground my-4" />
 
               {/* Items List */}
               <div className="space-y-2">
@@ -148,7 +148,7 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
                 ))}
               </div>
 
-              <div className="border-t border-dashed border-gray-200 my-4" />
+              <div className="border-t border-dashed border-muted-foreground my-4" />
 
               {/* Totals */}
               <div className="flex justify-between text-sm">

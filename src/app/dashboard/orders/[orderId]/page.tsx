@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import Spinner from "@/components/ui/spinner";
 import { useLOV } from "@/context/lov-context";
 import { useFetchOrderDetails } from "@/hooks/useOrder";
-import { OrderProduct } from "@/utils/types";
 import moment from "moment";
 import { notFound, useParams } from "next/navigation";
 import { useMemo } from "react";
@@ -53,9 +52,9 @@ const OrderDetail = () => {
   const order_products = useMemo(
     () => orderDetailRes?.data ?? [],
     [orderDetailRes]
-  ) as OrderProduct[];
+  );
 
-  const order = (order_products[0] ?? null) as OrderProduct | null;
+  const order = order_products[0] ?? null;
 
   const orderStatus = useMemo(
     () => lovs?.statuses?.find((s) => s.id === order?.status)?.name,

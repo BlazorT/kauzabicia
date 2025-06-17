@@ -14,7 +14,7 @@ import {
   getTaxAmount,
   getTotalOrderAmount,
 } from "@/utils/cartUtils";
-import { COLLAPSIBLE_REF, ORDER_RESPONSE, OrderProduct } from "@/utils/types";
+import { COLLAPSIBLE_REF, ORDER_RESPONSE } from "@/utils/types";
 import Lottie from "lottie-react";
 import { Loader2 } from "lucide-react";
 import moment from "moment";
@@ -24,6 +24,7 @@ import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
 
 import checkmarkAnimation from "@/assets/checkmark.json"; // adjust path accordingly
+import { USER_ROLE } from "@/constants/constants";
 import { useAuth } from "@/context/auth-context";
 import { useLOV } from "@/context/lov-context";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
@@ -34,7 +35,6 @@ import {
   isDistanceBufferValid,
 } from "@/utils/storeUtils";
 import { BookingInfo } from "../order/order-detail";
-import { USER_ROLE } from "@/constants/constants";
 
 type PlaceOrderProps = {
   guestsCollapsibleRef: RefObject<COLLAPSIBLE_REF | null>;
@@ -70,7 +70,7 @@ export default function PlaceOrder({
   const order_products = useMemo(
     () => orderDetailRes?.data ?? [],
     [orderDetailRes]
-  ) as OrderProduct[];
+  );
 
   // const { prepareRequest } = useEasyPaisa();
   // const { GooglePayButtonComponent, onGooglePay } = useGooglePay();

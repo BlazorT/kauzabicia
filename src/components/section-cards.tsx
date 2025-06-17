@@ -51,12 +51,12 @@ export function SectionCards() {
         const utcMoment = moment.utc();
         utcMoment.hour(stat.hour);
         const localHour = Number(utcMoment.local().format("H"));
-
+        // console.log({ localHour });
         if (localHour >= 0 && localHour < 9) {
           morning += totalOrders;
-        } else if (localHour >= 9 && localHour < 19) {
+        } else if (localHour >= 9 && localHour < 17) {
           noon += totalOrders;
-        } else if (localHour >= 19 && localHour <= 23) {
+        } else if (localHour >= 17 && localHour <= 23) {
           evening += totalOrders;
         }
       }
@@ -149,13 +149,17 @@ export function SectionCards() {
     {
       name: "morning",
       value: timeDistribution.morning,
-      fill: "var(--chart-2)",
+      fill: "oklch(0.6 0.118 184.704)",
     },
-    { name: "noon", value: timeDistribution.noon, fill: "var(--chart-1)" },
+    {
+      name: "noon",
+      value: timeDistribution.noon,
+      fill: "oklch(0.646 0.222 41.116)",
+    },
     {
       name: "evening",
       value: timeDistribution.evening,
-      fill: "var(--chart-3)",
+      fill: "oklch(0.398 0.07 227.392)",
     },
   ];
 

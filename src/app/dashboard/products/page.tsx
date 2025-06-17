@@ -121,7 +121,7 @@ function Products() {
     "0",
     "0"
   );
-  const products = (menuResponse?.data ?? []) as MenuItem[] | [];
+  const products = menuResponse?.data ?? [];
 
   // Sort products by lastUpdatedAt in descending order
   const sortedProducts = [...products].sort((a, b) => {
