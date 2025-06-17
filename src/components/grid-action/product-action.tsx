@@ -9,6 +9,7 @@ import { Loader2, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
 import { toast } from "sonner";
+import parse from "html-react-parser";
 
 type Props = {
   product: MenuItem;
@@ -66,7 +67,7 @@ const ProductAction = (props: Props) => {
             queryKey: [QUERY_KEYS.MENU, "1", "0", "1"],
           });
 
-          toast.success(res?.message);
+          toast.success(parse(res?.message ?? ""));
         } else {
           showAlert({
             title: "Error",

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -29,21 +28,21 @@ export function TeamSwitcher({
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <div className="flex items-center gap-2 w-full">
           <SidebarMenuButton
             size="lg"
-            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            className="flex-1 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            {/* <activeTeam.logo className="size-4" /> */}
             <Image src={"/logo.jpeg"} alt="logo" width={60} height={60} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{activeTeam.name}</span>
               <span className="truncate text-xs">{activeTeam.plan}</span>
             </div>
-            <ModeToggle />
           </SidebarMenuButton>
-          {/* </DropdownMenuTrigger> */}
-        </DropdownMenu>
+          <div className="flex-shrink-0">
+            <ModeToggle />
+          </div>
+        </div>
       </SidebarMenuItem>
     </SidebarMenu>
   );

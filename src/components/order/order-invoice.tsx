@@ -168,10 +168,11 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
           </div>
 
           <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
-              Close
-            </Button>
-            <Button onClick={handlePrintInvoice} disabled={isPrinting}>
+            <Button
+              onClick={handlePrintInvoice}
+              disabled={isPrinting}
+              className="w-full"
+            >
               {isPrinting ? (
                 <>
                   <Loader2 className="animate-spin w-4 h-4 mr-2" /> Printing...

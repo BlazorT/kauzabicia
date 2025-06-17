@@ -142,7 +142,7 @@ export default function CartItem({
         <MenuItemPricing item={item} />
       </div>
       {!item.isDeal && (
-        <div className="flex items-center gap-2 border-muted-foreground border-2 p-2 rounded-full hover:shadow-sm hover:shadow-muted-foreground/10 transition-transform duration-200">
+        <div className="flex items-center gap-2 border-muted-foreground/50 border-1 p-2 rounded-full hover:shadow-sm hover:shadow-muted-foreground/10 transition-transform duration-200">
           <div onClick={() => handleDecreaseOrRemove()}>
             {item.quantity === 1 ? (
               <Trash2 size={20} className="text-red-400" />

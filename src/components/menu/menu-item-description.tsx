@@ -29,7 +29,7 @@ export const MenuItemDescription = ({
     : description;
 
   return (
-    <p className="text-xs text-muted-foreground flex items-center gap-1">
+    <div className="text-xs text-muted-foreground flex items-center gap-1">
       {/*
       parse(displayHtml) converts the HTML string into a React element tree.
       React now manages these elements, and they behave like normal JSX children.
@@ -58,6 +58,6 @@ export const MenuItemDescription = ({
           </Tooltip>
         </TooltipProvider>
       )}
-    </p>
+    </div>
   );
 };
