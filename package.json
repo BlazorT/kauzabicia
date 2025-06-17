@@ -81,6 +81,7 @@
     "react-image-lightbox": "^5.1.4",
     "react-leaflet": "^5.0.0",
     "react-responsive-carousel": "^3.2.23",
+    "react-thermal-printer": "^0.21.0",
     "recharts": "^2.15.3",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",

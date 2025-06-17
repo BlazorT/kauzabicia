@@ -449,9 +449,9 @@ const ForgotForm = () => {
                   </FormItem>
                 )}
               />
+              <PasswordStrengthIndicator password={password ?? ""} />
             </>
           )}
-          <PasswordStrengthIndicator password={password ?? ""} />
 
           <Button type="submit" variant={"default"} className="w-full">
             {isPending ? (

@@ -2007,6 +2007,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-thermal-printer/image@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@react-thermal-printer/image@npm:0.13.0"
+  dependencies:
+    floyd-steinberg: "npm:^1.0.6"
+  checksum: 10c0/7887d65128699aa7c5f08a23da060cb0eb51643295cb2e5720260d0df774cd4ab265369131af6b77b9aa57b5b562ddd8fcaf01ce6ff8ba37eb69d946c48c5d56
+  languageName: node
+  linkType: hard
+
+"@react-thermal-printer/printer@npm:^0.18.0":
+  version: 0.18.0
+  resolution: "@react-thermal-printer/printer@npm:0.18.0"
+  dependencies:
+    "@react-thermal-printer/image": "npm:^0.13.0"
+  checksum: 10c0/7e7f6816e5584987a11558b7d1f72ce5e7c86547b51417f98d94ce130cee49c6d757a5f44aea8a64014fdfd7c903630072ea293e78adb63376471f5ee1bdb338
+  languageName: node
+  linkType: hard
+
 "@remirror/core-constants@npm:3.0.0":
   version: 3.0.0
   resolution: "@remirror/core-constants@npm:3.0.0"
@@ -3614,7 +3632,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.2.5":
+"classnames@npm:^2.2.5, classnames@npm:^2.3.1":
   version: 2.5.1
   resolution: "classnames@npm:2.5.1"
   checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
@@ -4392,6 +4410,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:^1.27.0":
+  version: 1.39.3
+  resolution: "es-toolkit@npm:1.39.3"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/1c85e518b1d129d38fdc5796af353f45e8dcb8a20968ff25da1ae1749fc4a36f914570fcd992df33b47c7bca9f3866d53e4e6fa6411c21eb424e99a3e479c96e
+  languageName: node
+  linkType: hard
+
 "escape-html@npm:^1.0.3":
   version: 1.0.3
   resolution: "escape-html@npm:1.0.3"
@@ -4923,6 +4953,13 @@ __metadata:
   version: 3.3.3
   resolution: "flatted@npm:3.3.3"
   checksum: 10c0/e957a1c6b0254aa15b8cce8533e24165abd98fadc98575db082b786b5da1b7d72062b81bfdcd1da2f4d46b6ed93bec2434e62333e9b4261d79ef2e75a10dd538
+  languageName: node
+  linkType: hard
+
+"floyd-steinberg@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "floyd-steinberg@npm:1.0.6"
+  checksum: 10c0/9524ce319ef47b0f8e9268731f6e998b3a9aa8b0f119ef1241a37b0b698707b283ac1e54727816a8a2f2443b422768926325db3b9ec88ca9093433b3ad29af34
   languageName: node
   linkType: hard
 
@@ -7283,6 +7320,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-thermal-printer@npm:^0.21.0":
+  version: 0.21.0
+  resolution: "react-thermal-printer@npm:0.21.0"
+  dependencies:
+    "@react-thermal-printer/image": "npm:^0.13.0"
+    "@react-thermal-printer/printer": "npm:^0.18.0"
+    classnames: "npm:^2.3.1"
+    es-toolkit: "npm:^1.27.0"
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  checksum: 10c0/46b7019189567b31fd0b4335345390bc0a3ac0bdc91124080faaf2c277608dbf149d3abf165ba178554aa47edd443036c3f5a3d9d4fe3033b657a3d023709bac
+  languageName: node
+  linkType: hard
+
 "react-transition-group@npm:^4.4.5":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
@@ -8224,6 +8276,7 @@ __metadata:
     react-image-lightbox: "npm:^5.1.4"
     react-leaflet: "npm:^5.0.0"
     react-responsive-carousel: "npm:^3.2.23"
+    react-thermal-printer: "npm:^0.21.0"
     recharts: "npm:^2.15.3"
     socket.io: "npm:^4.8.1"
     socket.io-client: "npm:^4.8.1"

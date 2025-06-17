@@ -1,17 +1,39 @@
-import { OrderProduct } from "@/utils/types";
-import { Card, CardContent } from "../ui/card";
-import { Loader2, NotepadText } from "lucide-react";
-import { Button } from "../ui/button";
-import { printInvoice } from "@/utils/printInvoice";
-import { useMemo, useState } from "react";
-import { useLOV } from "@/context/lov-context";
-import { useConfig } from "@/context/config-context";
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from "../ui/dialog";
-import { API_URL } from "@/services/apiClient";
-import moment from "moment";
 import { CustomerInfo } from "@/components/order/order-detail";
+import { useConfig } from "@/context/config-context";
+import { useLOV } from "@/context/lov-context";
+import { API_URL } from "@/services/apiClient";
 import { calculateTotal } from "@/utils/orderUtils";
+import { OrderProduct } from "@/utils/types";
+import { Loader2, NotepadText } from "lucide-react";
+import moment from "moment";
 import Image from "next/image";
+import { useMemo, useState } from "react";
+// import {
+//   Br,
+//   Cut,
+//   Line,
+//   Printer,
+//   Row,
+//   Text,
+//   render,
+//   Image as PrinterImage,
+// } from "react-thermal-printer";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "../ui/dialog";
+import { printInvoice } from "@/utils/printInvoice";
+
+declare global {
+  interface Navigator {
+    serial: {
+      requestPort(): Promise<SerialPort>;
+    };
+  }
+  interface SerialPort {
+    open(options: { baudRate: number }): Promise<void>;
+    writable: WritableStream<Uint8Array> | null;
+  }
+}
 
 type OrderSummaryProps = {
   orderItems: OrderProduct[];
@@ -24,6 +46,7 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
   const [isPrinting, setIsPrinting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [storeLogoErr, setStoreLogoErr] = useState(false);
+  // const [port, setPort] = useState<SerialPort>();
 
   const orderType = useMemo(
     () => lovs?.ordertypes?.find((s) => s.id === order?.saleTypeId)?.name ?? "",
@@ -48,6 +71,68 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
   const handlePrintInvoice = async () => {
     setIsPrinting(true);
     try {
+      // const timeLabel = order.saleTypeId === 3 ? "Delivery Time" : "ETA Time";
+      // const timeText = moment(order.deliveryTime).format(
+      //   "DD MMM YYYY, hh:mm A"
+      // );
+      // const logoUrl = API_URL + order.logoPath;
+
+      // const receipt = (
+      //   <Printer type="epson" width={42} characterSet="korea">
+      //     <PrinterImage
+      //       src={`/api/image-proxy?url=${encodeURIComponent(logoUrl)}`}
+      //       width={50}
+      //       height={50}
+      //     />
+      //     <Text size={{ width: 2, height: 2 }} align="center">
+      //       {order.tradeName}
+      //     </Text>
+      //     <Text size={{ width: 2, height: 2 }} align="center">
+      //       {order.storeAddress}
+      //     </Text>
+      //     <Br />
+      //     <Line />
+      //     <Row left="Tax Number:" right={config?.tax_Number ?? ""} />
+      //     <Row left="Order #:" right={order.saleId?.toString()} />
+      //     <Row left="Order Type" right={orderType} />
+      //     <Row left={timeLabel} right={timeText} />
+      //     <Row
+      //       left="Customer:"
+      //       right={parseCustomerInfo?.name || parseCustomerInfo?.contact || ""}
+      //     />
+      //     <Line />
+      //     {orderItems.map((item) => (
+      //       <Row
+      //         key={item.productDetailId}
+      //         left={`${item.totalLoadedQty} x ${item.productName}`}
+      //         right={calculateTotal(item)}
+      //       />
+      //     ))}
+      //     <Line />
+      //     <Row left="Tax" right={order.taxAmount?.toFixed(2)} />
+      //     <Row
+      //       left={<Text bold>`Total Bill: (${order.currencyCode ?? ""})`</Text>}
+      //       right={order.payableBill?.toFixed(2)}
+      //     />
+      //     <Br />
+      //     <Text>Thank you for choosing our store</Text>
+      //     <Cut />
+      //   </Printer>
+      // );
+      // const data: Uint8Array = await render(receipt);
+      // // console.log(data);
+      // let _port = port;
+      // if (_port == null) {
+      //   _port = await navigator.serial.requestPort();
+      //   await _port.open({ baudRate: 9600 });
+      //   setPort(_port);
+      // }
+
+      // const writer = _port.writable?.getWriter();
+      // if (writer != null) {
+      //   await writer.write(data);
+      //   writer.releaseLock();
+      // }
       await printInvoice(orderItems, orderType, config?.tax_Number ?? "");
     } catch (error) {
       console.error("PDF export failed", error);
