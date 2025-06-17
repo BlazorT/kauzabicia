@@ -74,6 +74,7 @@ export const useStoreFiltersQuery = (searchQuery: string) => {
     data: menuResponse,
     isPending,
     isError,
+    error,
   } = useMenu(
     DEFAULT_STORE_ID?.toString(),
     moment().format("YYYY-MM-DDTHH:mm:ss")
@@ -237,5 +238,6 @@ export const useStoreFiltersQuery = (searchQuery: string) => {
     filteredMenu,
     searchQuery,
     categorizedMenu,
+    error,
   };
 };

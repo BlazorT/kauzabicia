@@ -1,4 +1,5 @@
 // src/components/store/StoreInfo/components/StoreStatus.tsx
+import { STATUS } from "@/constants/constants";
 import { Loader2, AlertCircle, Info } from "lucide-react";
 
 export const LoadingState = () => (
@@ -11,7 +12,7 @@ export const LoadingState = () => (
 export const ErrorState = ({ message }: { message?: string }) => (
   <div className="flex items-center justify-center min-h-48 gap-4 text-destructive">
     <AlertCircle className="h-8 w-8" />
-    <p>{message || "Failed to load store information"}</p>
+    <p>{message || STATUS.SERVER_ERROR}</p>
   </div>
 );
 

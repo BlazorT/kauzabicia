@@ -1,14 +1,12 @@
 "use client";
 
 import { useStoreFiltersQuery } from "@/hooks/useStoreFiltersQuery";
+import { useStorePage } from "@/hooks/useStorePage";
 import { Filter, SearchX } from "lucide-react";
 import React, { RefObject } from "react";
-import StoreItem from "../store/store-item";
-import { ErrorState } from "../store/store-status";
-import { Button } from "../ui/button";
-import Spinner from "../ui/spinner";
-import { useStorePage } from "@/hooks/useStorePage";
 import { CategoryNav } from "../category/category-nav";
+import StoreItem from "../store/store-item";
+import { Button } from "../ui/button";
 
 interface HomeStoresProps {
   toggleFilterSheet: () => void;
@@ -22,14 +20,8 @@ const HomeStores: React.FC<HomeStoresProps> = ({
   setSearchQuery,
   // toggleIsMapVisble,
 }) => {
-  const {
-    storeData,
-    filteredMenu,
-    isPending,
-    isError,
-    clearAllFilters,
-    filterCount,
-  } = useStoreFiltersQuery(searchQuery);
+  const { storeData, filteredMenu, clearAllFilters, filterCount } =
+    useStoreFiltersQuery(searchQuery);
 
   const {
     activeCategory,
@@ -42,8 +34,6 @@ const HomeStores: React.FC<HomeStoresProps> = ({
     scrollToCategory,
   } = useStorePage();
 
-  if (isError) return <ErrorState />;
-  if (isPending) return <Spinner />;
   // if (isPending)
   //   return (
   //     <div className="space-y-2">

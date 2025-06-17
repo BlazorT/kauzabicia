@@ -6,7 +6,11 @@ import HomeStores from "@/components/home/home-stores";
 import Footer from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import Spinner from "@/components/ui/spinner";
+import { STATUS } from "@/constants/constants";
 import { useRestaurantFilters } from "@/context/restaurant-filter-context";
+import { useStoreFiltersQuery } from "@/hooks/useStoreFiltersQuery";
+import { AlertCircle, RotateCw } from "lucide-react";
 import { useState } from "react";
 
 const Home = () => {
@@ -14,7 +18,33 @@ const Home = () => {
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { isPending, isError, error } = useStoreFiltersQuery(searchQuery);
+
   const toggleFilterSheet = () => setIsFilterSheetOpen(!isFilterSheetOpen);
+
+  if (isError)
+    return (
+      <div className="flex items-center justify-center min-h-[80vh] w-full">
+        <div className="p-6 text-center flex flex-col items-center text-base text-muted-foreground border border-dashed rounded-xl space-y-4 shadow-md ">
+          <AlertCircle size={80} className="text-red-400" />
+          <p className="text-2xl font-semibold">{error?.message ?? "Error"}</p>
+          <p className="text-lg text-gray-500 max-w-sm">
+            {STATUS.SERVER_ERROR}
+          </p>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => {
+              window.location.reload(); // Force full reload
+            }}
+          >
+            <RotateCw />
+            Reload
+          </Button>
+        </div>
+      </div>
+    );
+  if (isPending) return <Spinner />;
 
   return (
     <div className="container mx-auto my-0">
