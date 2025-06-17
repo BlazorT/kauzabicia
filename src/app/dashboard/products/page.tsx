@@ -1,11 +1,9 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 
 import ProductAction from "@/components/grid-action/product-action";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { GridTable } from "@/components/ui/grid-table";
 import { useMenu } from "@/hooks/useMenu";
 import { API_URL } from "@/services/apiClient";
@@ -77,17 +75,7 @@ const columns: ColumnDef<MenuItem>[] = [
   },
   {
     accessorKey: "unitprice",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Sale Price
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: "Sale Price",
     cell: ({ row }) => {
       const value = row.getValue("unitprice") as number;
       return <div className="lowercase">{value?.toFixed(2)}</div>;
@@ -95,17 +83,7 @@ const columns: ColumnDef<MenuItem>[] = [
   },
   {
     accessorKey: "kitchenTimeInMins",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Ready Time (mins)
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: "Ready Time (mins)",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("kitchenTimeInMins")}</div>
     ),
@@ -122,9 +100,17 @@ const columns: ColumnDef<MenuItem>[] = [
   },
   {
     id: "lastUpdatedAt",
-    header: "lastUpdatedAt",
-    sortingFn: "datetime",
-    cell: ({ row }) => moment(row.getValue("lastUpdatedAt")).local().format(""),
+    header: "Last Updated At",
+    sortingFn: (rowA, rowB) => {
+      const dateA = moment(rowA.original.lastUpdatedAt).valueOf();
+      const dateB = moment(rowB.original.lastUpdatedAt).valueOf();
+      return dateB - dateA; // descending: latest date+time on top
+    },
+    cell: ({ row }) => {
+      return moment(row.original.lastUpdatedAt)
+        .local()
+        .format("YYYY-MM-DD HH:mm:ss");
+    },
   },
 ];
 
@@ -136,12 +122,13 @@ function Products() {
     "0"
   );
   const products = (menuResponse?.data ?? []) as MenuItem[] | [];
-  const sorting = [
-    {
-      id: "lastUpdatedAt",
-      desc: true, // sort by name in descending order by default
-    },
-  ];
+
+  // Sort products by lastUpdatedAt in descending order
+  const sortedProducts = [...products].sort((a, b) => {
+    const dateA = moment(a.lastUpdatedAt).valueOf();
+    const dateB = moment(b.lastUpdatedAt).valueOf();
+    return dateB - dateA;
+  });
 
   const columnVisibility = {
     unitname: false,
@@ -153,10 +140,9 @@ function Products() {
     <div className="w-full">
       <GridTable
         columns={columns}
-        data={products}
+        data={sortedProducts}
         showPagination
         initialColumnVisibility={columnVisibility}
-        initialSorting={sorting}
         loading={isPending}
         filterableColumnId="productname"
         filterableColumnPlaceholder="Search Products..."

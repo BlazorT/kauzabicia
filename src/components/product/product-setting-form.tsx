@@ -117,7 +117,7 @@ const formSchema = z.object({
   readyTime: z.coerce
     .number()
     .min(0, "Ready time cannot be negative")
-    .max(1000, "Ready time cannot exceed 1000 minutes")
+    .max(10000, "Ready time cannot exceed 10000 minutes")
     .int("Ready time must be an integer")
     .refine((val) => !isNaN(val), { message: "Ready time must be a number" }),
   status: z.number().optional(),
@@ -280,7 +280,7 @@ const ProductSettingForm = () => {
   // const discountPercent = form.watch("discountPercent");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []).reverse();
 
     if (files.length === 0) return;
 
@@ -299,7 +299,6 @@ const ProductSettingForm = () => {
         toast.error(`Image "${file.name}" size should be less than 5MB`);
         return;
       }
-
       const reader = new FileReader();
       const promise = new Promise<void>((resolve) => {
         reader.onloadend = () => {

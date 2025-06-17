@@ -4,6 +4,7 @@ import {
   BookOpen,
   Bot,
   GalleryVerticalEnd,
+  LayoutDashboard,
   PackageSearch,
   ScrollText,
   Settings2,
@@ -137,6 +138,11 @@ const data = {
     },
   ],
   projects: [
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
+    },
     {
       name: "Menu",
       url: "/dashboard/menu",

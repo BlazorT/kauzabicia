@@ -162,7 +162,7 @@ const OrderInvoice: React.FC<OrderSummaryProps> = ({ orderItems }) => {
 
               {/* Thank you message */}
               <p className="text-center text-sm text-muted-foreground mt-6">
-                Thank you for choosing our restaurant
+                Thank you for choosing our store
               </p>
             </div>
           </div>

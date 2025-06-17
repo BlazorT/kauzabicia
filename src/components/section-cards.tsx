@@ -1,101 +1,267 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Label,
+  LabelList,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
+  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useFetchOrderStats } from "@/hooks/useOrder";
+import moment from "moment";
+import { useMemo } from "react";
+import { OrderStatsResponse } from "./chart-area-interactive";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "./ui/chart";
 
 export function SectionCards() {
+  const { data } = useFetchOrderStats() as { data: OrderStatsResponse };
+
+  const timeDistribution = useMemo(() => {
+    if (!data?.data) return { morning: 0, noon: 0, evening: 0, total: 0 };
+
+    let morning = 0;
+    let noon = 0;
+    let evening = 0;
+    let total = 0;
+
+    data.data.forEach((stat) => {
+      if (stat.statsday === 1) {
+        // Only process today's data
+        const totalOrders =
+          stat.ready + stat.inprogress + stat.delivered + stat.dispatched;
+        total += totalOrders;
+
+        const utcMoment = moment.utc();
+        utcMoment.hour(stat.hour);
+        const localHour = Number(utcMoment.local().format("H"));
+
+        if (localHour >= 0 && localHour < 9) {
+          morning += totalOrders;
+        } else if (localHour >= 9 && localHour < 19) {
+          noon += totalOrders;
+        } else if (localHour >= 19 && localHour <= 23) {
+          evening += totalOrders;
+        }
+      }
+    });
+
+    return { morning, noon, evening, total };
+  }, [data]);
+
+  const statusDistribution = useMemo(() => {
+    if (!data?.data) return [];
+
+    let inProgress = 0;
+    let dispatched = 0;
+    let delivered = 0;
+    let total = 0;
+
+    data.data.forEach((stat) => {
+      if (stat.statsday === 1) {
+        // Only process today's data
+        inProgress += stat.ready + stat.inprogress;
+        dispatched += stat.dispatched;
+        delivered += stat.delivered;
+        total +=
+          stat.ready + stat.inprogress + stat.dispatched + stat.delivered;
+      }
+    });
+
+    return [
+      {
+        name: "In Progress",
+        value: inProgress,
+        fill: "var(--destructive)",
+      },
+      {
+        name: "Dispatched",
+        value: dispatched,
+        fill: "var(--chart-3)",
+      },
+      {
+        name: "Delivered",
+        value: delivered,
+        fill: "var(--chart-2)",
+      },
+      {
+        name: "Total Orders",
+        value: total,
+        fill: "var(--primary)",
+      },
+    ];
+  }, [data]);
+
+  const barConfig = {
+    progress: {
+      label: "progress",
+      color: "hsl(var(--primary))",
+    },
+    Dispatched: {
+      label: "Dispatched",
+      color: "var(--primary)",
+    },
+    delivered: {
+      label: "delivered",
+      color: "hsl(var(--accent))",
+    },
+    total: {
+      label: "total",
+      color: "hsl(var(--accent))",
+    },
+    label: {
+      color: "var(--card-foreground)",
+    },
+  } satisfies ChartConfig;
+
+  const chartConfig = {
+    morning: {
+      label: "Morning",
+      color: "hsl(var(--primary))",
+    },
+    noon: {
+      label: "Noon",
+      color: "var(--primary)",
+    },
+    evening: {
+      label: "Evening",
+      color: "hsl(var(--accent))",
+    },
+  } satisfies ChartConfig;
+
+  const pieData = [
+    {
+      name: "morning",
+      value: timeDistribution.morning,
+      fill: "var(--chart-2)",
+    },
+    { name: "noon", value: timeDistribution.noon, fill: "var(--chart-1)" },
+    {
+      name: "evening",
+      value: timeDistribution.evening,
+      fill: "var(--chart-3)",
+    },
+  ];
+
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction>
+    <div className="grid gap-4 lg:grid-cols-3">
+      <Card className="flex flex-col lg:col-span-2">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Order Distribution</CardTitle>
+          <CardDescription>Today&apos;s orders by time of day</CardDescription>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
-          </div>
-        </CardFooter>
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={50}
+                outerRadius={80}
+                paddingAngle={3}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {timeDistribution.total.toLocaleString()}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Total Orders
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+              <ChartLegend
+                content={<ChartLegendContent nameKey="name" />}
+                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+              />
+            </PieChart>
+          </ChartContainer>
+        </CardContent>
       </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingDown />
-              -20%
-            </Badge>
-          </CardAction>
+
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Order Status</CardTitle>
+          <CardDescription>Today&apos;s orders by status</CardDescription>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <IconTrendingDown className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Acquisition needs attention
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +4.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
-        </CardFooter>
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer config={barConfig}>
+            <BarChart
+              accessibilityLayer
+              data={statusDistribution}
+              layout="vertical"
+              margin={{
+                left: 8,
+              }}
+            >
+              <CartesianGrid horizontal={false} className="bg-primary" />
+              <XAxis type="number" dataKey="value" hide />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tickLine={false}
+                tickMargin={0}
+                axisLine={false}
+                // tickFormatter={(value) => value}
+              />
+
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Bar dataKey="value" fill="var(--primary)" radius={4}>
+                <LabelList
+                  dataKey="value"
+                  position="right"
+                  offset={8}
+                  fontSize={12}
+                  className="fill-foreground"
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
       </Card>
     </div>
   );

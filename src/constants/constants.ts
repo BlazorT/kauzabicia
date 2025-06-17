@@ -124,7 +124,7 @@ export const STATUS = {
   FAILED_PAYMENT: "Payment Failed, Please try again.",
 };
 
-export const COMPANY_NAME = "Mealz N Dealz, Powered By Blazor Technologies Inc";
+export const COMPANY_NAME = "Kalida, Powered By Blazor Technologies Inc";
 export const MAX_PRICE = 5000;
 export const MIN_PRICE = 1;
 export const IMAGE_MIN = 400;

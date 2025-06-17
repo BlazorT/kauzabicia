@@ -174,7 +174,7 @@ export const printInvoice = async (
   // Thank you message
   pdf.setFontSize(8);
   pdf.setTextColor(100, 100, 100); // Muted gray color
-  const thankYouText = "Thank you for choosing our restaurant";
+  const thankYouText = "Thank you for choosing our store";
   const thankYouWidth =
     (pdf.getStringUnitWidth(thankYouText) * 8) / pdf.internal.scaleFactor;
   const thankYouX = (pageWidth - thankYouWidth) / 2;

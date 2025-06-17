@@ -51,7 +51,8 @@ export const useFetchOrders = (createdBy: string) => {
     dateTo: moment().utc().format(),
     keyword: "",
   };
-  // console.log({ body, user });
+  // console.log({ body });
+  // console.log(JSON.stringify(body));
   return useQuery({
     queryKey: getOrdersQueryKey(createdBy, body.storeid ?? "0"),
     queryFn: () => orderService.getOrders(body),
@@ -70,6 +71,12 @@ export const useFetchOrderDetails = (id: string | null) => {
     staleTime: 1 * 60 * 1000, // 5 minutes: data is fresh for this duration
     refetchInterval: 1 * 60 * 1000, // refetch every 5 minutes
     refetchIntervalInBackground: true, // optional for React web; no effect on mobile when app is in background
+  });
+};
+export const useFetchOrderStats = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.ORDERS_STATS],
+    queryFn: () => orderService.getOrdersStats(),
   });
 };
 

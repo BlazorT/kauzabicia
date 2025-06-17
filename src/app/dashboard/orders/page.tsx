@@ -20,6 +20,7 @@ const Orders: React.FC = () => {
     isError,
     error,
   } = useFetchOrders((user?.id ?? 0).toString());
+  // console.log({ ordersRes });
   const filteredOrders = useMemo(() => {
     const allOrders: ORDER[] = (ordersRes?.data as ORDER[]) ?? [];
 
@@ -30,7 +31,6 @@ const Orders: React.FC = () => {
           new Date(b.createdat).getTime() - new Date(a.createdat).getTime()
       );
   }, [ordersRes]);
-  // console.log({ ordersRes });
   const activeOrders = useMemo(() => {
     return filteredOrders.filter((order) => [1, 3, 7].includes(order.status));
   }, [filteredOrders]);

@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
   CONFIG: "config",
   LOVS: "lovs",
   ORDERS: "orders",
+  ORDERS_STATS: "orders-stats",
   ORDER_DETAIL: "order-detail",
   IP_INFO: "ip-info",
   ADDRESS: "address",

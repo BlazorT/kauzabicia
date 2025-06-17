@@ -325,8 +325,7 @@ export default function PlaceOrder({
       .add(kitchenTime + readyTime, "minutes")
       .format("YYYY-MM-DDTHH:mm:ss");
 
-    const guestCount =
-      orderInfo.orderType === 1 ? parseInt(orderInfo?.guests ?? "0") : 0;
+    const guestCount = 0;
 
     const customerInfo =
       !orderInfo.name &&
@@ -537,14 +536,14 @@ export default function PlaceOrder({
       fmctoken: "",
       tableBookings: mergedTableBookings,
     };
-    console.log({ orderBody });
+    // console.log({ orderBody });
     // console.log(JSON.stringify(orderBody));
     // return;
     placeCompactOrder(
       { orderBody },
       {
         onSuccess: (response) => {
-          console.log(response);
+          // console.log(response);
           if (response && response.status === true) {
             const orderResponse = response.data as ORDER_RESPONSE;
 

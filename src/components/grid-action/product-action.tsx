@@ -65,6 +65,7 @@ const ProductAction = (props: Props) => {
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.MENU, "1", "0", "1"],
           });
+
           toast.success(res?.message);
         } else {
           showAlert({
