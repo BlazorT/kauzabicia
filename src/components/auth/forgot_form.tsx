@@ -197,7 +197,6 @@ const ForgotForm = () => {
     if (res?.status) {
       if (reset) setResendTimer(60);
       if (nextStep === 2) {
-        // console.log(res.data);
         const receivedCode = (res?.data as string) ?? "";
         setCode(receivedCode);
       }

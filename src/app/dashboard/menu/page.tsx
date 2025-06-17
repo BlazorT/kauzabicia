@@ -340,6 +340,7 @@ export default function StorePage() {
       deliveryNote: order?.deliveryNote,
       address: order?.address,
       orderNote: order?.orderNote,
+      serviceCharges: order?.serviceCharges,
       selectedSeats: parseBookingInfo
         ? parseBookingInfo?.map((booking) => ({
             tableId: booking.RestaurantTableId,
