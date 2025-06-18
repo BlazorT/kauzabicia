@@ -85,7 +85,11 @@ const columns: ColumnDef<MenuItem>[] = [
     accessorKey: "kitchenTimeInMins",
     header: "Ready Time (mins)",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("kitchenTimeInMins")}</div>
+      <div className="capitalize">
+        {row.getValue("kitchenTimeInMins") === 0
+          ? "-"
+          : row.getValue("kitchenTimeInMins")}
+      </div>
     ),
   },
 
@@ -144,6 +148,7 @@ function Products() {
         showPagination
         initialColumnVisibility={columnVisibility}
         loading={isPending}
+        showRowSelectionInfo={false}
         filterableColumnId="productname"
         filterableColumnPlaceholder="Search Products..."
       />

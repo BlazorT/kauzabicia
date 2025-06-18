@@ -204,6 +204,19 @@ const AccountForm = () => {
     }
   };
 
+  const onCancel = () => {
+    showAlert({
+      title: "Confirmation!",
+      description: "Are you sure you want to cancel profile update!",
+      confirmText: "Yes",
+      cancelText: "Cancel",
+      onConfirm: () =>
+        router.replace(
+          `/${user?.roleId !== USER_ROLE.USER ? "dashboard" : ""}`
+        ),
+    });
+  };
+
   return (
     <Form {...form}>
       <form
@@ -321,17 +334,28 @@ const AccountForm = () => {
           )}
         />
 
-        <Button
-          type="submit"
-          variant={"default"}
-          className="w-full"
-          disabled={isPending || isPendingImageUpload || !isFormChanged()}
-        >
-          {(isPending || isPendingImageUpload) && (
-            <Loader2 className="animate-spin" />
-          )}
-          Update
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant={"outline"}
+            className="flex-1/2"
+            onClick={onCancel}
+            disabled={isPending || isPendingImageUpload}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant={"default"}
+            className="flex-1/2"
+            disabled={isPending || isPendingImageUpload || !isFormChanged()}
+          >
+            {(isPending || isPendingImageUpload) && (
+              <Loader2 className="animate-spin" />
+            )}
+            Update
+          </Button>
+        </div>
       </form>
     </Form>
   );

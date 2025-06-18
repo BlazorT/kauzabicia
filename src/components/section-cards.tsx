@@ -162,13 +162,13 @@ export function SectionCards() {
       fill: "oklch(0.398 0.07 227.392)",
     },
   ];
-
+  if (timeDistribution.total === 0) return null;
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       <Card className="flex flex-col lg:col-span-2">
         <CardHeader className="items-center pb-0">
-          <CardTitle>Order Distribution</CardTitle>
-          <CardDescription>Today&apos;s orders by time of day</CardDescription>
+          <CardTitle>Orders Distribution</CardTitle>
+          <CardDescription>Today Orders</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
           <ChartContainer
@@ -226,17 +226,21 @@ export function SectionCards() {
 
       <Card className="flex flex-col">
         <CardHeader className="items-center pb-0">
-          <CardTitle>Order Status</CardTitle>
-          <CardDescription>Today&apos;s orders by status</CardDescription>
+          <CardTitle>Orders By Status</CardTitle>
+          <CardDescription>Today Orders</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
-          <ChartContainer config={barConfig}>
+          <ChartContainer
+            config={barConfig}
+            className="mx-auto aspect-square max-h-[250px] w-full"
+          >
             <BarChart
               accessibilityLayer
               data={statusDistribution}
               layout="vertical"
               margin={{
-                left: 8,
+                left: 0,
+                right: 15,
               }}
             >
               <CartesianGrid horizontal={false} className="bg-primary" />

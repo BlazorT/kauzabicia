@@ -70,7 +70,7 @@ const Orders: React.FC = () => {
     <div className="container mx-auto p-2">
       {activeOrders?.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Active Orders</h2>
+          <h2 className="text-xl font-semibold mb-4">Orders</h2>
           <div className="space-y-4">
             {activeOrders.map((order) => (
               <OrderItem
@@ -85,7 +85,7 @@ const Orders: React.FC = () => {
 
       {pastOrders?.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-xl font-semibold  mb-4">Past Orders</h2>
+          <h2 className="text-xl font-semibold  mb-4">Orders (Past)</h2>
           <div className="space-y-4">
             {pastOrders.map((order, index) => (
               <OrderItem key={index} order={order} isActiveOrder={false} />

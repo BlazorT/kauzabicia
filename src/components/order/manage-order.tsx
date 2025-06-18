@@ -95,7 +95,7 @@ const ManageOrder: React.FC<ManageOrderProps> = ({
         className="w-auto"
         onClick={onManageOrder}
       >
-        Manage Order
+        Change Order
       </Button>
     </>
   );

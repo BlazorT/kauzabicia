@@ -114,66 +114,66 @@ const OrderDetails: React.FC<OrderDetailProps> = ({ order }) => {
           {isDeliveryOption && (
             <InfoItem
               icon={Truck}
-              label="Delivery Option:"
+              label="Delivery Option :"
               value={isDeliveryOption}
             />
           )}
           {order?.orderNote && (
             <InfoItem
               icon={ScrollText}
-              label="Order Note:"
+              label="Order Note :"
               value={order.orderNote}
             />
           )}
           {order?.deliveryNote && (
             <InfoItem
               icon={ScrollText}
-              label="Delivery Note:"
+              label="Delivery Note :"
               value={order.deliveryNote}
             />
           )}
           {order?.address && (
             <InfoItem
               icon={MapPin}
-              label="Order Address:"
+              label="Order Address :"
               value={order.address}
             />
           )}
           {order?.guestscount > 0 && (
-            <InfoItem icon={Users} label="Guests:" value={order.guestscount} />
+            <InfoItem icon={Users} label="Guests :" value={order.guestscount} />
           )}
           {parseCustomerInfo?.name && (
             <InfoItem
               icon={User}
-              label="Name:"
+              label="Name :"
               value={parseCustomerInfo.name}
             />
           )}
           {parseCustomerInfo?.email && (
             <InfoItem
               icon={Mail}
-              label="Email:"
+              label="Email :"
               value={parseCustomerInfo.email}
             />
           )}
           {parseCustomerInfo?.contact && (
             <InfoItem
               icon={Phone}
-              label="Contact:"
+              label="Contact :"
               value={parseCustomerInfo.contact}
             />
           )}
           {parseCustomerInfo?.whatsapp && (
             <InfoItem
               icon={MessageCircleMore}
-              label="WhatsApp:"
+              label="WhatsApp :"
               value={parseCustomerInfo.whatsapp}
             />
           )}
           {parseCustomerInfo?.state && (
             <InfoItem
               icon={ChartColumnStacked}
-              label="State:"
+              label="State :"
               value={parseCustomerInfo.state}
             />
           )}
@@ -181,7 +181,7 @@ const OrderDetails: React.FC<OrderDetailProps> = ({ order }) => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Table className="w-4 h-4 text-primary" />
-                <span className="font-semibold">Table Booking:</span>
+                <span className="font-semibold">Table Booking :</span>
               </div>
               <div className="flex flex-col gap-2 pl-6">
                 {Object.entries(groupedBookings).map(([tableId, bookings]) => (

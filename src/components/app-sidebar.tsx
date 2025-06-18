@@ -37,7 +37,7 @@ const data = {
     {
       name: "Kalida",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Building Materials",
     },
     // {
     //   name: "Acme Corp.",

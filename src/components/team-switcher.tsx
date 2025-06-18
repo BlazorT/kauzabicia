@@ -36,9 +36,9 @@ export function TeamSwitcher({
             className="flex-1 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Image src={"/logo.jpeg"} alt="logo" width={80} height={80} />
-            <div className="grid flex-1 text-left text-sm leading-tight">
+            <div className="grid flex-1 text-left text-lg leading-tight">
               <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs">{activeTeam.plan}</span>
+              {/* <span className="truncate text-xs">{activeTeam.plan}</span> */}
             </div>
           </SidebarMenuButton>
           {open && (

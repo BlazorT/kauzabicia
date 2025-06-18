@@ -96,10 +96,8 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Order Statistics</CardTitle>
-        <CardDescription>
-          Comparison of orders between today and yesterday
-        </CardDescription>
+        <CardTitle>Orders Statistics</CardTitle>
+        <CardDescription>Today Vs Yesterday</CardDescription>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer

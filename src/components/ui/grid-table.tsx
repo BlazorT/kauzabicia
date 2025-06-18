@@ -290,7 +290,12 @@ export function GridTable<TData, TValue>({
 
       {/* Pagination and row selection info section */}
       {showPagination && table.getRowModel().rows?.length > 0 && (
-        <div className="flex items-center justify-between px-4 mt-2">
+        <div
+          className={cn(
+            "flex items-center px-4 mt-2",
+            showRowSelectionInfo ? "justify-between " : "justify-end "
+          )}
+        >
           {showRowSelectionInfo && (
             <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
               {table.getFilteredSelectedRowModel().rows.length} of{" "}
