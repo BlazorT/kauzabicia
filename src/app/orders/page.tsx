@@ -66,7 +66,7 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="mt-2">
+    <div className="mt-14">
       {activeOrders?.length > 0 && (
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Orders</h2>

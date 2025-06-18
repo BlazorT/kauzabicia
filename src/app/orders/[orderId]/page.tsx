@@ -89,7 +89,7 @@ const OrderDetail = () => {
   if (!order) return <ErrorState message={"Failed to get order deatails"} />;
 
   return (
-    <div className="mt-2 grid-cols-1 lg:grid-cols-6 grid gap-3">
+    <div className="mt-14 grid-cols-1 lg:grid-cols-6 grid gap-3">
       <div className="col-span-3 p-0 space-y-3">
         <Card className="p-0">
           <CardContent className="p-2 ">
